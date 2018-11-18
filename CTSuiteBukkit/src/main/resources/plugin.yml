@@ -1,0 +1,10 @@
+name: CTSuiteBukkit
+main: de.crafttogether.ctsuite.bukkit.CTSuite
+version: 1.0
+website: http://www.craft-together.de
+author: J0schlZ
+description: An essential plugin for BungeeCord
+commands:
+   gamemode:
+     description: Execute a BungeeCord command as the console or a player
+     usage: /gamemode <gameMode> [player]
