@@ -1,19 +1,27 @@
 package de.crafttogether.ctsuite.bukkit;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.zaxxer.hikari.HikariDataSource;
 
 import de.crafttogether.ctsuite.bukkit.events.PlayerJoinListener;
 import de.crafttogether.ctsuite.bukkit.handlers.PlayerHandler;
+import net.milkbowl.vault.chat.Chat;
 
 public class CTSuite extends JavaPlugin {	
     private static CTSuite instance;
     private HikariDataSource hikari;
     private Configuration config;
     private String tablePrefix;
+    private Chat chat;
+    private boolean vaultLoaded;
+    private Logger log;
     
     private PlayerHandler playerHandler;
 
@@ -22,6 +30,7 @@ public class CTSuite extends JavaPlugin {
 
         saveDefaultConfig();
         config = getConfig();
+        log = Bukkit.getLogger();
 
         hikari = new HikariDataSource();
         hikari.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
@@ -31,7 +40,18 @@ public class CTSuite extends JavaPlugin {
         hikari.addDataSourceProperty("user", config.get("MySQL.user"));
         hikari.addDataSourceProperty("password", config.get("MySQL.password"));
         tablePrefix = config.getString("MySQL.prefix");
-
+        
+        // Chef if Vault is loaded
+        vaultLoaded = (getServer().getPluginManager().getPlugin("Vault") != null) ? true : false;
+        if (vaultLoaded) {
+            RegisteredServiceProvider<Chat> chatProvider = getServer().getServicesManager().getRegistration(Chat.class);
+            if (chatProvider != null)
+                chat = chatProvider.getProvider();
+        }
+        else {
+        	getLog().log(Level.WARNING, "Couln't find Vault.");
+        }
+        
         playerHandler = new PlayerHandler(this);
         
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
@@ -50,6 +70,14 @@ public class CTSuite extends JavaPlugin {
 
     public String getTablePrefix() {
     	return tablePrefix;
+    }
+    
+    public Logger getLog() {
+    	return log;
+    }
+    
+    public Chat getChat() {
+    	return chat;
     }
     
     public PlayerHandler getPlayerHandler() {
