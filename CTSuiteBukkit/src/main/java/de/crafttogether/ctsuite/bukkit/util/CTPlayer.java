@@ -1,4 +1,4 @@
-package de.crafttogether.ctsuite.bukkit;
+package de.crafttogether.ctsuite.bukkit.util;
 
 public class CTPlayer
 {

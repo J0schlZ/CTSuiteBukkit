@@ -4,4 +4,4 @@ MySQL:
   database: minecraft
   prefix: ct_
   user: root
-  password: 
+  password: ''
