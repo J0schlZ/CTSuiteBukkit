@@ -33,20 +33,19 @@ public class PluginMessage {
     		@Override
     		public void run() {
     			ByteArrayOutputStream b = new ByteArrayOutputStream();
-    	        DataOutputStream out = new DataOutputStream(b);
-
-    	        try {
-    	        	for(int i = 0; i < values.size(); i++) {
-    	        		out.writeUTF(values.get(i));
+                DataOutputStream out = new DataOutputStream(b);
+                
+                try {
+                    out.writeUTF(name);
+                    
+                    for(int i = 0; i < values.size(); i++) {
+    	        		out.writeUTF("" + values.get(i).toString());
     	    		}
-    	        	
-    	        	p.sendPluginMessage(main, "CTSuite", b.toByteArray());
-
-					b.close();
-	    	        out.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                
+                p.sendPluginMessage(main, "CTSuite", b.toByteArray());
             }
     	});
 	}
