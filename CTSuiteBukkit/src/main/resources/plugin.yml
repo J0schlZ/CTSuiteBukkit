@@ -6,5 +6,5 @@ author: J0schlZ
 description: An essential plugin for BungeeCord
 commands:
    gamemode:
-     description: Execute a BungeeCord command as the console or a player
+     description: Change Gamemode
      usage: /gamemode <gameMode> [player]
