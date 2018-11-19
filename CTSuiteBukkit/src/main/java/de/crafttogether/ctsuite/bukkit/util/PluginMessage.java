@@ -15,12 +15,12 @@ import de.crafttogether.ctsuite.bukkit.CTSuite;
 public class PluginMessage {
 	private CTSuite main;
 	
-	private String name;
+	private String messageName;
 	private ArrayList<String> values;
 	
 	public PluginMessage(CTSuite main, String name) {
 		this.main = main;
-		this.name = name;
+		this.messageName = name;
 		values = new ArrayList<String>();
 	}
 	
@@ -29,24 +29,29 @@ public class PluginMessage {
 	}
 	
 	public void send(Player p) {
+		final String serverName = p.getServer().getServerName();
+		
     	Bukkit.getScheduler().runTaskAsynchronously(main, new Runnable() {
     		@Override
-    		public void run() {
-    			ByteArrayOutputStream b = new ByteArrayOutputStream();
-                DataOutputStream out = new DataOutputStream(b);
-                
+    		public void run() {                
                 try {
-                    out.writeUTF(name);
+                    ByteArrayOutputStream b = new ByteArrayOutputStream();
+                    DataOutputStream out = new DataOutputStream(b);
+                        
+                    out.writeUTF(messageName);
+                    out.writeUTF(serverName);
+                    for(int i = 0; i < values.size(); i++)
+    	        		out.writeUTF("");
                     
-                    for(int i = 0; i < values.size(); i++) {
-    	        		out.writeUTF("" + values.get(i).toString());
-    	    		}
+                    b.close();
+                    out.close();
+                    p.sendPluginMessage(main, "ctsuite:bungee", b.toByteArray());
+                    
+                    main.getLogger().log(Level.INFO, "Send PluginMessage to Bungeecoord [" + messageName + "]");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                
-                p.sendPluginMessage(main, "CTSuite", b.toByteArray());
-            }
+    		}
     	});
 	}
 }

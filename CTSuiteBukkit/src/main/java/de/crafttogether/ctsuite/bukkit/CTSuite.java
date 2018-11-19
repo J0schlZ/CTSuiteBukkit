@@ -55,6 +55,9 @@ public class CTSuite extends JavaPlugin {
         playerHandler = new PlayerHandler(this);
         
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+        
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "ctsuite:bungee");
+        //getServer().getMessenger().registerIncomingPluginChasnnel(this, "ctsuite:bukkit", new PluginMessageListener(this));
     }
 
     public void onDisable() {
