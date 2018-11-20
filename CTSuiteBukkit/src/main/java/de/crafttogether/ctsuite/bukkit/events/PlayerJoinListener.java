@@ -20,6 +20,7 @@ public class PlayerJoinListener implements Listener {
 	@EventHandler(priority=EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent ev) {
     	Player p = ev.getPlayer();
+  
     	String prefix = main.getChat().getPlayerPrefix(p);
     	String suffix = main.getChat().getPlayerSuffix(p);
 

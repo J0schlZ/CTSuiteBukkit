@@ -5,6 +5,9 @@ website: http://www.craft-together.de
 author: J0schlZ
 description: An essential plugin for BungeeCord
 commands:
+   fly:
+     description: Toggle Flymode
+     usage: /fly [player]
    gamemode:
      description: Change Gamemode
      usage: /gamemode <gameMode> [player]

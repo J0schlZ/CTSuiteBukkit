@@ -3,6 +3,7 @@ package de.crafttogether.ctsuite.bukkit.util;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
@@ -25,11 +26,9 @@ public class PMessageListener implements PluginMessageListener {
 
         String value;
 		String messageName = null;
-		String serverName = null;
         
         try {
-            messageName = in.readUTF();                
-            serverName = in.readUTF();
+            messageName = in.readUTF();
             
             try {
             	while ((value = in.readUTF()) != null)
@@ -40,17 +39,17 @@ public class PMessageListener implements PluginMessageListener {
         	e.printStackTrace();
         }
 
-        main.getLogger().log(Level.INFO, "[PMessage][Bungee->" + serverName + "]: " + messageName);
+        main.getLogger().log(Level.INFO, "[PMessage][Bungee->" + Bukkit.getServerName() + "]: " + messageName);
         
-        switch(messageName) {
-        	
-        	case "bukkit.player.setGamemode":
-        		System.out.println("SETZE GAMEMODE "  + values.get(0));
-        		break;
-        	
+        switch(messageName) {        	
         		
-        	case "bungee.player.setFlying":
-        		
+        	case "bukkit.player.set.isAllowedFlight":
+        		/*
+        		 * 0 => (str)	uuid
+        		 * 1 => (bool)	isAllowedFlight
+        		 */
+        		System.out.println(values.get(0) + "-" + values.get(1));
+        		main.getPlayerHandler().setIsAllowedFlight(values.get(0), (values.get(1).equals("true") ? true : false));
         		break;
         }
     }

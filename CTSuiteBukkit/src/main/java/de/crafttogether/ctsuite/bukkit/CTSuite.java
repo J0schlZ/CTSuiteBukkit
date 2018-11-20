@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import de.crafttogether.ctsuite.bukkit.commands.FlyCommand;
 import de.crafttogether.ctsuite.bukkit.events.PlayerJoinListener;
 import de.crafttogether.ctsuite.bukkit.handlers.PlayerHandler;
 import de.crafttogether.ctsuite.bukkit.util.PMessageListener;
@@ -59,6 +60,8 @@ public class CTSuite extends JavaPlugin {
         
         getServer().getMessenger().registerOutgoingPluginChannel(this, "ctsuite:bungee");
         getServer().getMessenger().registerIncomingPluginChannel(this, "ctsuite:bukkit", new PMessageListener(this));
+        
+        this.getCommand("fly").setExecutor(new FlyCommand(this));
     }
 
     public void onDisable() {

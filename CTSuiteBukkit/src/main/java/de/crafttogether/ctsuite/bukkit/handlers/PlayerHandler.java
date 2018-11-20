@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import de.crafttogether.ctsuite.bukkit.CTSuite;
@@ -47,5 +48,23 @@ public class PlayerHandler {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+	}
+	
+	public void setIsAllowedFlight(String uuid, Boolean isAllowedFlight) {
+		OfflinePlayer user = Bukkit.getOfflinePlayer(uuid);
+		System.out.println("try set fly " + isAllowedFlight);
+		if (user.isOnline()) {
+			Player p = Bukkit.getPlayer(uuid);
+			
+			if (isAllowedFlight) {
+				p.setAllowFlight(false);
+				p.setFlying(false);
+			}
+			else
+				p.setAllowFlight(true);
+		}
+		else {
+			// Set fly when player is offline
+		}
 	}
 }

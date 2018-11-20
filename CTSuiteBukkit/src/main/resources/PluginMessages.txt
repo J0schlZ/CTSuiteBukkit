@@ -1,0 +1,4 @@
+bungee.player.update.prefixSuffix			0 => (str)	uuid		1 => (str)	prefix			2 => (str)	suffix
+bungee.player.update.isAllowedFlight		0 => (str)	uuid		1 => (str)	senderUUID		2 => (bool)	isAllowedFlight		3 => (bool)	apply
+
+bukkit.player.set.isAllowedFlight			0 => (str)	uuid	1 => (bool)	isAllowedFlight
