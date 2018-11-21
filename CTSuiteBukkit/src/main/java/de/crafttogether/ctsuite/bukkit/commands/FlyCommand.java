@@ -25,6 +25,9 @@ public class FlyCommand implements CommandExecutor  {
     	if (sender instanceof Player)
     		p = Bukkit.getPlayer(((Player) sender).getUniqueId());
     	
+    	if (p != null && !main.getPlayerHandler().checkPermission(p, "ctsuite.command.fly"))
+    		return false;
+    	
     	// Self
     	if (args.length < 1 || args[0] == "true" || args[0] == "false") {
     		if (p == null) {

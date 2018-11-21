@@ -2,12 +2,15 @@ package de.crafttogether.ctsuite.bukkit.handlers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import de.crafttogether.ctsuite.bukkit.CTSuite;
+import de.crafttogether.ctsuite.bukkit.util.PMessage;
 
 public class PlayerHandler {
 	private CTSuite main;
@@ -48,6 +51,25 @@ public class PlayerHandler {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+	}
+	
+	public boolean hasPermission(Player p, String perm) {
+		if (p.isOp() || p.hasPermission(perm))
+			return true;
+		
+		return false;
+	}
+	
+	public boolean checkPermission(Player p, String perm) {
+		if (hasPermission(p, perm))
+			return true;
+		
+		PMessage pm = new PMessage(main, "bungee.player.inform.permissionDenied");
+		pm.put(p.getUniqueId().toString());
+		pm.put(perm);
+		pm.send(p);
+		
+		return false;		
 	}
 	
 	public void setIsAllowedFlight(String uuid, Boolean isAllowedFlight) {
