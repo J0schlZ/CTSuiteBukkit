@@ -25,40 +25,40 @@ public class FlyCommand implements CommandExecutor  {
     	if (sender instanceof Player)
     		p = Bukkit.getPlayer(((Player) sender).getUniqueId());
     	
-    	if (p != null && !main.getPlayerHandler().checkPermission(p, "ctsuite.command.fly"))
-    		return false;
-    	
     	// Self
     	if (args.length < 1 || args[0] == "true" || args[0] == "false") {
     		if (p == null) {
     			main.getLogger().log(Level.INFO, "[CTSuite]: This command can't performed by Console");
-    			return false;
+    			return true;
     		}
+    		
+        	if (p != null && main.getPlayerHandler().checkPermission(p, "ctsuite.command.fly") == false)
+        		return true;
     		
         	String uuid = p.getUniqueId().toString();
     		Boolean isAllowedFlight = null;
     		
     		if (args.length > 0) {
-    			if (args[0] == "on") isAllowedFlight = true;
-    			if (args[0] == "off") isAllowedFlight = false;
+    			if (args[0].equals("on") || args[0].equals("yes") || args[0].equals("true")) isAllowedFlight = true;
+    			if (args[0].equals("off") || args[0].equals("no") || args[0].equals("false")) isAllowedFlight = false;
     		}
     		
     		if (isAllowedFlight == null) {
     			isAllowedFlight = p.getAllowFlight();
-    		
+    			
     			if (isAllowedFlight == true) {
-    				//p.setAllowFlight(false);
+    				p.setAllowFlight(false);
     				// Add teleportation to ground
-    				//p.setFlying(false);
+    				p.setFlying(false);
     				isAllowedFlight = false;
     			}
     			else {
-    				//p.setAllowFlight(true);
+    				p.setAllowFlight(true);
     				isAllowedFlight = true;
     			}
     		}
     		else {
-    			//p.setAllowFlight(isAllowedFlight);  
+    			p.setAllowFlight(isAllowedFlight);  
     		}
     		
     		// PluginMessage
@@ -66,7 +66,7 @@ public class FlyCommand implements CommandExecutor  {
     		pm.put((p == null) ? "CONSOLE" : uuid);
     		pm.put((p == null) ? "CONSOLE" : uuid);
     		pm.put(isAllowedFlight ? "true" : "false");
-    		pm.put("true");
+    		pm.put("false");
     		pm.send(p);
     	}
     	

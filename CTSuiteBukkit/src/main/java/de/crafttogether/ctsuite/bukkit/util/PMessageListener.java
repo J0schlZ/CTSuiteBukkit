@@ -48,7 +48,6 @@ public class PMessageListener implements PluginMessageListener {
         		 * 0 => (str)	uuid
         		 * 1 => (bool)	isAllowedFlight
         		 */
-        		System.out.println(values.get(0) + "-" + values.get(1));
         		main.getPlayerHandler().setIsAllowedFlight(values.get(0), (values.get(1).equals("true") ? true : false));
         		break;
         }

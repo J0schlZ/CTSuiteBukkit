@@ -17,7 +17,7 @@ public class PlayerJoinListener implements Listener {
         this.main = main;
     }
 
-	@EventHandler(priority=EventPriority.MONITOR)
+	@EventHandler(priority=EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent ev) {
     	Player p = ev.getPlayer();
   
@@ -26,6 +26,8 @@ public class PlayerJoinListener implements Listener {
 
     	final String fPrefix = (prefix != null && !prefix.equals("")) ? prefix : null;
     	final String fSuffix = (suffix != null && !suffix.equals("")) ? suffix : null;
+    	
+    	main.getPlayerHandler().registerLogin(ev.getPlayer());
     	
 		new BukkitRunnable() {
 			public void run() {
@@ -36,7 +38,5 @@ public class PlayerJoinListener implements Listener {
         		pm.send(p);
 			}
 		}.runTaskLater(main, 20L);
-    	
-    	main.getPlayerHandler().registerLogin(ev.getPlayer());
     }
 }

@@ -12,6 +12,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import de.crafttogether.ctsuite.bukkit.commands.FlyCommand;
 import de.crafttogether.ctsuite.bukkit.events.PlayerJoinListener;
+import de.crafttogether.ctsuite.bukkit.events.PlayerToggleFlightListener;
 import de.crafttogether.ctsuite.bukkit.handlers.PlayerHandler;
 import de.crafttogether.ctsuite.bukkit.util.PMessageListener;
 import net.milkbowl.vault.chat.Chat;
@@ -55,8 +56,9 @@ public class CTSuite extends JavaPlugin {
         }
         
         playerHandler = new PlayerHandler(this);
-        
+
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerToggleFlightListener(this), this);
         
         getServer().getMessenger().registerOutgoingPluginChannel(this, "ctsuite:bungee");
         getServer().getMessenger().registerIncomingPluginChannel(this, "ctsuite:bukkit", new PMessageListener(this));

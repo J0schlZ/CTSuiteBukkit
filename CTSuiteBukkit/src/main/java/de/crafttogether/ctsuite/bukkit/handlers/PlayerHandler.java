@@ -2,6 +2,7 @@ package de.crafttogether.ctsuite.bukkit.handlers;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,8 +44,16 @@ public class PlayerHandler {
     		            }
                 	}
                 });
-	          
-	            p.sendMessage("[CTSuiteBukkit]: Gefunden, geupdated.");
+	            
+	            // Set Fly-Mode
+	            if (rs.getInt("allowed_flight") == 1) {
+	            	p.setAllowFlight(true);
+	            	if (rs.getInt("flying") == 1)
+	            		p.setFlying(true);
+	            }
+	            else
+	            	p.setAllowFlight(false);
+	            
             } else {
                 p.sendMessage("[CTSuiteBukkit]: Hab dich leider nicht gefunden! Jaa dieser Fall kann auftreten. :(");
             }
@@ -61,9 +70,12 @@ public class PlayerHandler {
 	}
 	
 	public boolean checkPermission(Player p, String perm) {
-		if (hasPermission(p, perm))
+		if (hasPermission(p, perm)) {
+			System.out.println("PermissionCheck for player " + p.getName() + " -> true");
 			return true;
+		}
 		
+		System.out.println("PermissionCheck for player " + p.getName() + " -> false");
 		PMessage pm = new PMessage(main, "bungee.player.inform.permissionDenied");
 		pm.put(p.getUniqueId().toString());
 		pm.put(perm);
@@ -72,21 +84,30 @@ public class PlayerHandler {
 		return false;		
 	}
 	
+	public boolean isOnline(String uuid) {
+		Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
+		for (Player p : players) {
+			if (p.getUniqueId().toString().equals(uuid))
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public Player getOnlinePlayer(String uuid) {
+		Collection<? extends Player> players = Bukkit.getServer().getOnlinePlayers();
+		for (Player p : players) {
+			if (p.getUniqueId().toString().equals(uuid))
+				return p;
+		}
+		
+		return null;
+	}
+	
 	public void setIsAllowedFlight(String uuid, Boolean isAllowedFlight) {
-		OfflinePlayer user = Bukkit.getOfflinePlayer(uuid);
-		System.out.println("try set fly " + isAllowedFlight);
-		if (user.isOnline()) {
-			Player p = Bukkit.getPlayer(uuid);
-			
-			if (isAllowedFlight) {
-				p.setAllowFlight(false);
-				p.setFlying(false);
-			}
-			else
-				p.setAllowFlight(true);
-		}
-		else {
-			// Set fly when player is offline
-		}
+		Player p = getOnlinePlayer(uuid);
+
+		if (p != null)
+			p.setAllowFlight(isAllowedFlight);
 	}
 }
