@@ -17,7 +17,7 @@ import de.crafttogether.ctsuite.bukkit.handlers.PlayerHandler;
 import de.crafttogether.ctsuite.bukkit.util.PMessageListener;
 import net.milkbowl.vault.chat.Chat;
 
-public class CTSuite extends JavaPlugin {	
+public class CTSuite extends JavaPlugin {
     private static CTSuite instance;
     private HikariDataSource hikari;
     private Configuration config;
@@ -25,7 +25,7 @@ public class CTSuite extends JavaPlugin {
     private Chat chat;
     private boolean vaultLoaded;
     private Logger log;
-    
+
     private PlayerHandler playerHandler;
 
     public void onEnable() {
@@ -43,60 +43,58 @@ public class CTSuite extends JavaPlugin {
         hikari.addDataSourceProperty("user", config.get("MySQL.user"));
         hikari.addDataSourceProperty("password", config.get("MySQL.password"));
         tablePrefix = config.getString("MySQL.prefix");
-        
+
         // Chef if Vault is loaded
         vaultLoaded = (getServer().getPluginManager().getPlugin("Vault") != null) ? true : false;
         if (vaultLoaded) {
-            RegisteredServiceProvider<Chat> chatProvider = getServer().getServicesManager().getRegistration(Chat.class);
+            RegisteredServiceProvider < Chat > chatProvider = getServer().getServicesManager().getRegistration(Chat.class);
             if (chatProvider != null)
                 chat = chatProvider.getProvider();
+        } else {
+            getLog().log(Level.WARNING, "Couln't find Vault.");
         }
-        else {
-        	getLog().log(Level.WARNING, "Couln't find Vault.");
-        }
-        
+
         playerHandler = new PlayerHandler(this);
 
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new PlayerToggleFlightListener(this), this);
-        
+
         getServer().getMessenger().registerOutgoingPluginChannel(this, "ctsuite:bungee");
         getServer().getMessenger().registerIncomingPluginChannel(this, "ctsuite:bukkit", new PMessageListener(this));
-        
+
         this.getCommand("fly").setExecutor(new FlyCommand(this));
     }
 
     public void onDisable() {
         if (hikari != null) {
-        	try {
-        		hikari.close();
-        	}
-        	catch (Exception ex) {
-        		System.out.println(ex);
-        	}
+            try {
+                hikari.close();
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
         }
     }
 
     public String getTablePrefix() {
-    	return tablePrefix;
+        return tablePrefix;
     }
-    
+
     public Logger getLog() {
-    	return log;
+        return log;
     }
-    
+
     public Chat getChat() {
-    	return chat;
+        return chat;
     }
-    
+
     public PlayerHandler getPlayerHandler() {
-    	return playerHandler;
+        return playerHandler;
     }
-    
+
     public HikariDataSource getHikari() {
         return hikari;
     }
-    
+
     public static CTSuite getInstance() {
         return instance;
     }

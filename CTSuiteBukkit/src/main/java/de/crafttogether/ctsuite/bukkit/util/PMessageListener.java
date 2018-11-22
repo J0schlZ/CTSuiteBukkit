@@ -19,37 +19,36 @@ public class PMessageListener implements PluginMessageListener {
         this.main = main;
     }
 
-	@Override
-	public void onPluginMessageReceived(String channel, Player player, byte[] message) {
-		ByteArrayDataInput in = ByteStreams.newDataInput(message);
-		ArrayList<String> values = new ArrayList<String>();                    
+    @Override
+    public void onPluginMessageReceived(String channel, Player player, byte[] message) {
+        ByteArrayDataInput in = ByteStreams.newDataInput(message);
+        ArrayList < String > values = new ArrayList < String > ();
 
         String value;
-		String messageName = null;
-        
+        String messageName = null;
+
         try {
-            messageName = in.readUTF();
-            
+            messageName = in .readUTF();
+
             try {
-            	while ((value = in.readUTF()) != null)
-            		values.add(value);
-            } catch (Exception e) { }
-		}
-        catch (Exception e) {
-        	e.printStackTrace();
+                while ((value = in .readUTF()) != null)
+                    values.add(value);
+            } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         main.getLogger().log(Level.INFO, "[PMessage][Bungee->" + Bukkit.getServerName() + "]: " + messageName);
-        
-        switch(messageName) {        	
-        		
-        	case "bukkit.player.set.isAllowedFlight":
-        		/*
-        		 * 0 => (str)	uuid
-        		 * 1 => (bool)	isAllowedFlight
-        		 */
-        		main.getPlayerHandler().setIsAllowedFlight(values.get(0), (values.get(1).equals("true") ? true : false));
-        		break;
+
+        switch (messageName) {
+
+            case "bukkit.player.set.isAllowedFlight":
+                /*
+                 * 0 => (str)	uuid
+                 * 1 => (bool)	isAllowedFlight
+                 */
+                main.getPlayerHandler().setIsAllowedFlight(values.get(0), (values.get(1).equals("true") ? true : false));
+                break;
         }
     }
 }

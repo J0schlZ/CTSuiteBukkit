@@ -18,24 +18,24 @@ public class PlayerToggleFlightListener implements Listener {
         this.main = main;
     }
 
-	@EventHandler(priority=EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerToggleFlight(PlayerToggleFlightEvent ev) {
-    	Player p = ev.getPlayer();
+        Player p = ev.getPlayer();
 
-    	Bukkit.getScheduler().runTaskAsynchronously(CTSuite.getInstance(), new Runnable() {
-        	public void run() {
-        		try {
-        			String sql = 
-        	          "UPDATE " + main.getTablePrefix() + "players SET " +
-        	            "flying = " + (p.isFlying() ? 1 : 0)  + ", " +
-        	            "last_seen = now() " +
-        	          "WHERE uuid = '" + p.getUniqueId() + "'";
-	              
-        			main.getHikari().getConnection().createStatement().execute(sql);
-	            } catch (SQLException e) {
-	                e.printStackTrace();
-	            }
-        	}
+        Bukkit.getScheduler().runTaskAsynchronously(CTSuite.getInstance(), new Runnable() {
+            public void run() {
+                try {
+                    String sql =
+                        "UPDATE " + main.getTablePrefix() + "players SET " +
+                        "flying = " + (p.isFlying() ? 1 : 0) + ", " +
+                        "last_seen = now() " +
+                        "WHERE uuid = '" + p.getUniqueId() + "'";
+
+                    main.getHikari().getConnection().createStatement().execute(sql);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         });
 
     }

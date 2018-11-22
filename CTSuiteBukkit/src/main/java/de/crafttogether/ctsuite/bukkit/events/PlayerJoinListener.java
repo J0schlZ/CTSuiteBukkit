@@ -17,26 +17,26 @@ public class PlayerJoinListener implements Listener {
         this.main = main;
     }
 
-	@EventHandler(priority=EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent ev) {
-    	Player p = ev.getPlayer();
-  
-    	String prefix = main.getChat().getPlayerPrefix(p);
-    	String suffix = main.getChat().getPlayerSuffix(p);
+        Player p = ev.getPlayer();
 
-    	final String fPrefix = (prefix != null && !prefix.equals("")) ? prefix : null;
-    	final String fSuffix = (suffix != null && !suffix.equals("")) ? suffix : null;
-    	
-    	main.getPlayerHandler().registerLogin(ev.getPlayer());
-    	
-		new BukkitRunnable() {
-			public void run() {
-				PMessage pm = new PMessage(main, "bungee.player.updatePrefixSuffix");
-        		pm.put(p.getUniqueId().toString());
-        		pm.put("prefix - " + fPrefix);
-        		pm.put("suffix - " + fSuffix);
-        		pm.send(p);
-			}
-		}.runTaskLater(main, 20L);
+        String prefix = main.getChat().getPlayerPrefix(p);
+        String suffix = main.getChat().getPlayerSuffix(p);
+
+        final String fPrefix = (prefix != null && !prefix.equals("")) ? prefix : null;
+        final String fSuffix = (suffix != null && !suffix.equals("")) ? suffix : null;
+
+        main.getPlayerHandler().registerLogin(ev.getPlayer());
+
+        new BukkitRunnable() {
+            public void run() {
+                PMessage pm = new PMessage(main, "bungee.player.updatePrefixSuffix");
+                pm.put(p.getUniqueId().toString());
+                pm.put("prefix - " + fPrefix);
+                pm.put("suffix - " + fSuffix);
+                pm.send(p);
+            }
+        }.runTaskLater(main, 20 L);
     }
 }
