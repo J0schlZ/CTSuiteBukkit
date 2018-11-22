@@ -1,5 +1,7 @@
 package de.crafttogether.ctsuite.bukkit;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -91,8 +93,13 @@ public class CTSuite extends JavaPlugin {
         return playerHandler;
     }
 
-    public HikariDataSource getHikari() {
-        return hikari;
+    public Connection getConnection() {
+        try {
+			return this.hikari.getConnection();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
     }
 
     public static CTSuite getInstance() {

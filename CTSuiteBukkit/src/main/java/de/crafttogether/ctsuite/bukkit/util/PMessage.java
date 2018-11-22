@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -28,35 +30,52 @@ public class PMessage {
     }
 
     public void send(Player p) {
-        final String serverName = p.getServer().getServerName();
-
-        Bukkit.getScheduler().runTaskAsynchronously(main, new Runnable() {
-            @Override
-            public void run() {
-                ByteArrayOutputStream b = new ByteArrayOutputStream();
-                DataOutputStream out = new DataOutputStream(b);
-
-                try {
-                    out.writeUTF(messageName);
-                    out.writeUTF(serverName);
-                    for (int i = 0; i < values.size(); i++)
-                        out.writeUTF(values.get(i));
-
-                    b.close();
-                    out.close();
-                    p.sendPluginMessage(main, "ctsuite:bungee", b.toByteArray());
-                    main.getLogger().log(Level.INFO, "[PMessage][" + serverName + "->Bungee]: " + messageName);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        b.close();
-                        out.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+        Iterator <? extends Player> iterator;
+        
+        if ((p == null) || (!p.isOnline())) {
+            Collection <? extends Player> onlinePlayers = Bukkit.getServer().getOnlinePlayers();
+            
+            for (iterator = onlinePlayers.iterator(); iterator.hasNext();) {
+                p = (Player) iterator.next();
+                if (p.isOnline()) {
+                    break;
                 }
             }
-        });
+        }
+        if (p == null) {
+            this.main.getLogger().warning("[CTSuite] Unable to send PMessage (" + this.messageName + ") - No player found");
+        } else {
+            final Player finalPlayer = p;
+            final String serverName = finalPlayer.getServer().getServerName();
+
+	        Bukkit.getScheduler().runTaskAsynchronously(main, new Runnable() {
+	            @Override
+	            public void run() {
+	                ByteArrayOutputStream b = new ByteArrayOutputStream();
+	                DataOutputStream out = new DataOutputStream(b);
+	
+	                try {
+	                    out.writeUTF(messageName);
+	                    out.writeUTF(serverName);
+	                    for (int i = 0; i < values.size(); i++)
+	                        out.writeUTF(values.get(i));
+	
+	                    b.close();
+	                    out.close();
+	                    finalPlayer.sendPluginMessage(main, "ctsuite:bungee", b.toByteArray());
+	                    main.getLogger().log(Level.INFO, "[PMessage][" + serverName + "->Bungee]: " + messageName);
+	                } catch (IOException e) {
+	                    e.printStackTrace();
+	                } finally {
+	                    try {
+	                        b.close();
+	                        out.close();
+	                    } catch (IOException e) {
+	                        e.printStackTrace();
+	                    }
+	                }
+	            }
+	        });
+        }
     }
 }

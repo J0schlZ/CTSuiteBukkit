@@ -1,13 +1,12 @@
 package de.crafttogether.ctsuite.bukkit.handlers;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import de.crafttogether.ctsuite.bukkit.CTSuite;
@@ -21,34 +20,49 @@ public class PlayerHandler {
     }
 
     public void registerLogin(Player p) {
+    	ResultSet resultSet = null;
+        PreparedStatement statement = null;
+        Connection connection = null;
+        
         try {
-            String sql = "SELECT * FROM `" + main.getTablePrefix() + "players` WHERE `uuid` = '" + p.getUniqueId().toString() + "'";
+        	connection = main.getConnection();
+			statement = connection.prepareStatement("SELECT * FROM " + main.getTablePrefix() + "players WHERE uuid = ?;");
+			statement.setString(1, p.getUniqueId().toString());
+			resultSet = statement.executeQuery();
 
-            ResultSet rs = main.getHikari().getConnection().createStatement().executeQuery(sql);
-            if (rs.next()) {
-
+            if (resultSet.next()) {
                 // Update Database
                 Bukkit.getScheduler().runTaskAsynchronously(CTSuite.getInstance(), new Runnable() {
                     public void run() {
-                        try {
-                            String sql =
-                                "UPDATE " + main.getTablePrefix() + "players SET " +
-                                "server = '" + Bukkit.getServerName() + "', " +
-                                "world = '" + p.getWorld().getName() + "', " +
-                                "last_seen = now() " +
-                                "WHERE uuid = '" + p.getUniqueId() + "'";
-
-                            main.getHikari().getConnection().createStatement().execute(sql);
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                        }
+                        PreparedStatement statement = null;
+                        Connection connection = null;
+                        
+		                try {
+		                	connection = main.getConnection();
+							statement = connection.prepareStatement("UPDATE " + main.getTablePrefix() + "players SET server = ?, world = ?, last_seen = now() WHERE uuid = ?;");
+							statement.setString(1, Bukkit.getServerName());
+							statement.setString(2, p.getWorld().getName());
+							statement.setString(3, p.getUniqueId().toString());
+							statement.execute();
+		    			} catch (SQLException e) {
+							e.printStackTrace();
+						} finally {
+				            if (statement != null) {
+				                try { statement.close(); }
+				                catch (SQLException e) { e.printStackTrace(); }
+				            }
+				            if (connection != null) {
+				                try { connection.close(); }
+				                catch (SQLException e) { e.printStackTrace(); }
+				            }
+				        }
                     }
                 });
 
                 // Set Fly-Mode
-                if (rs.getInt("allowed_flight") == 1) {
+                if (resultSet.getInt("allowed_flight") == 1) {
                     p.setAllowFlight(true);
-                    if (rs.getInt("flying") == 1)
+                    if (resultSet.getInt("flying") == 1)
                         p.setFlying(true);
                 } else
                     p.setAllowFlight(false);
@@ -58,6 +72,19 @@ public class PlayerHandler {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            if (resultSet != null) {
+                try { resultSet.close(); }
+                catch (SQLException e) { e.printStackTrace(); }
+            }
+            if (statement != null) {
+                try { statement.close(); }
+                catch (SQLException e) { e.printStackTrace(); }
+            }
+            if (connection != null) {
+                try { connection.close(); }
+                catch (SQLException e) { e.printStackTrace(); }
+            }
         }
     }
 

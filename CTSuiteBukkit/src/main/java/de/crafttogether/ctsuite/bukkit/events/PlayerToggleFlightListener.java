@@ -1,5 +1,7 @@
 package de.crafttogether.ctsuite.bukkit.events;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.bukkit.Bukkit;
@@ -24,17 +26,27 @@ public class PlayerToggleFlightListener implements Listener {
 
         Bukkit.getScheduler().runTaskAsynchronously(CTSuite.getInstance(), new Runnable() {
             public void run() {
+                PreparedStatement statement = null;
+                Connection connection = null;
+                
                 try {
-                    String sql =
-                        "UPDATE " + main.getTablePrefix() + "players SET " +
-                        "flying = " + (p.isFlying() ? 1 : 0) + ", " +
-                        "last_seen = now() " +
-                        "WHERE uuid = '" + p.getUniqueId() + "'";
-
-                    main.getHikari().getConnection().createStatement().execute(sql);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+                	connection = main.getConnection();
+					statement = connection.prepareStatement("UPDATE " + main.getTablePrefix() + "players SET flying = ?, last_seen = now() WHERE uuid = ?;");
+					statement.setInt(1, (p.isFlying() ? 1 : 0));
+					statement.setString(2, p.getUniqueId().toString());
+					statement.execute();
+    			} catch (SQLException e) {
+					e.printStackTrace();
+				} finally {
+		            if (statement != null) {
+		                try { statement.close(); }
+		                catch (SQLException e) { e.printStackTrace(); }
+		            }
+		            if (connection != null) {
+		                try { connection.close(); }
+		                catch (SQLException e) { e.printStackTrace(); }
+		            }
+		        }
             }
         });
 
