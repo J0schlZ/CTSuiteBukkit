@@ -84,7 +84,7 @@ public class PlayerHandler {
     }
 
     public boolean isOnline(String uuid) {
-        Collection << ? extends Player > players = Bukkit.getServer().getOnlinePlayers();
+        Collection < ? extends Player > players = Bukkit.getServer().getOnlinePlayers();
         for (Player p: players) {
             if (p.getUniqueId().toString().equals(uuid))
                 return true;
@@ -94,7 +94,7 @@ public class PlayerHandler {
     }
 
     public Player getOnlinePlayer(String uuid) {
-        Collection << ? extends Player > players = Bukkit.getServer().getOnlinePlayers();
+        Collection < ? extends Player > players = Bukkit.getServer().getOnlinePlayers();
         for (Player p: players) {
             if (p.getUniqueId().toString().equals(uuid))
                 return p;

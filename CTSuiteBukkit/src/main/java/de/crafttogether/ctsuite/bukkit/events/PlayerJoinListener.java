@@ -37,6 +37,6 @@ public class PlayerJoinListener implements Listener {
                 pm.put("suffix - " + fSuffix);
                 pm.send(p);
             }
-        }.runTaskLater(main, 20 L);
+        }.runTaskLater(main, 20L);
     }
 }
