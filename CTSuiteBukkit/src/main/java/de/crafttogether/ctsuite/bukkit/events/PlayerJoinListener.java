@@ -9,6 +9,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import de.crafttogether.ctsuite.bukkit.CTSuite;
 import de.crafttogether.ctsuite.bukkit.util.PMessage;
+import net.milkbowl.vault.chat.Chat;
 
 public class PlayerJoinListener implements Listener {
     private CTSuite main;
@@ -21,8 +22,16 @@ public class PlayerJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent ev) {
         Player p = ev.getPlayer();
 
-        String prefix = main.getChat().getPlayerPrefix(p);
-        String suffix = main.getChat().getPlayerSuffix(p);
+        Chat chat = main.getChat();
+        String prefix = null;
+        String suffix = null;
+        
+        if (chat != null) {
+	        try {
+	        	prefix = main.getChat().getPlayerPrefix(p);
+	        	suffix = main.getChat().getPlayerSuffix(p);
+	        } catch (Exception ex) { }
+        }
 
         final String fPrefix = (prefix != null && !prefix.equals("")) ? prefix : null;
         final String fSuffix = (suffix != null && !suffix.equals("")) ? suffix : null;

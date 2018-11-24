@@ -1,6 +1,7 @@
 package de.crafttogether.ctsuite.bukkit.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -24,15 +25,15 @@ public class PMessageListener implements PluginMessageListener {
         ByteArrayDataInput in = ByteStreams.newDataInput(message);
         ArrayList < String > values = new ArrayList < String > ();
 
-        String value;
+        String val;
         String messageName = null;
 
         try {
             messageName = in .readUTF();
 
             try {
-                while ((value = in .readUTF()) != null)
-                    values.add(value);
+                while ((val = in .readUTF()) != null)
+                    values.add(val);
             } catch (Exception e) {}
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,6 +42,20 @@ public class PMessageListener implements PluginMessageListener {
         main.getLogger().log(Level.INFO, "[PMessage][Bungee->" + Bukkit.getServerName() + "]: " + messageName);
 
         switch (messageName) {
+        
+        	case "bukkit.data.update.onlinePlayers":
+        		/*
+        		 * 0 => (str)	uuid:name
+        		 * 1 => (str)	uuid:name,
+        		 * 2 => ...	
+        		 */
+        		HashMap<String, String> newList = new HashMap<String, String>();
+        		for (String value : values) {
+        			String[] splitted = value.split(":");
+        			newList.put(splitted[0], splitted[1]);
+        		}
+        		main.getPlayerHandler().bungeeOnlinePlayers = newList;
+        		break;
 
             case "bukkit.player.set.isAllowedFlight":
                 /*

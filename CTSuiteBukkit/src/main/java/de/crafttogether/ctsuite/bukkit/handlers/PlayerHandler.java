@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -14,9 +15,12 @@ import de.crafttogether.ctsuite.bukkit.util.PMessage;
 
 public class PlayerHandler {
     private CTSuite main;
-
+    
+    public HashMap<String, String> bungeeOnlinePlayers;
+    
     public PlayerHandler(CTSuite main) {
         this.main = main;
+        this.bungeeOnlinePlayers = new HashMap<String, String>();
     }
 
     public void registerLogin(Player p) {

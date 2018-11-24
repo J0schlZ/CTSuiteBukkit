@@ -22,11 +22,11 @@ public class PMessage {
     public PMessage(CTSuite main, String name) {
         this.main = main;
         this.messageName = name;
-        values = new ArrayList < String > ();
+        this.values = new ArrayList <String> ();
     }
 
     public void put(String value) {
-        values.add(value);
+        this.values.add(value);
     }
 
     public void send(Player p) {
@@ -42,11 +42,13 @@ public class PMessage {
                 }
             }
         }
+        
         if (p == null) {
             this.main.getLogger().warning("[CTSuite] Unable to send PMessage (" + this.messageName + ") - No player found");
         } else {
             final Player finalPlayer = p;
             final String serverName = finalPlayer.getServer().getServerName();
+            final ArrayList <String> values = this.values;
 
 	        Bukkit.getScheduler().runTaskAsynchronously(main, new Runnable() {
 	            @Override

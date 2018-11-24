@@ -1,18 +1,22 @@
 package de.crafttogether.ctsuite.bukkit.commands;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 
 import de.crafttogether.ctsuite.bukkit.CTSuite;
 import de.crafttogether.ctsuite.bukkit.util.PMessage;
 
-public class FlyCommand
-implements CommandExecutor {
+public class FlyCommand implements TabExecutor {
     private CTSuite main;
 
     public FlyCommand(CTSuite main) {
@@ -34,20 +38,18 @@ implements CommandExecutor {
                 this.main.getLogger().log(Level.INFO, "[CTSuite]: This command can't performed by Console");
                 return true;
             }
-            if (!this.main.getPlayerHandler().checkPermission(p, "ctsuite.command.fly")) {
+            
+            if (!this.main.getPlayerHandler().checkPermission(p, "ctsuite.command.fly"))
                 return true;
-            }
             
             String uuid = p.getUniqueId().toString();
             Boolean isAllowedFlight = null;
             
             if (args.length > 0) {
-                if (argTrue) {
+                if (argTrue)
                     isAllowedFlight = true;
-                }
-                if (argFalse) {
+                if (argFalse)
                     isAllowedFlight = false;
-                }
             }
             
             if (isAllowedFlight == null) {
@@ -61,9 +63,8 @@ implements CommandExecutor {
                     p.setAllowFlight(true);
                     isAllowedFlight = true;
                 }
-            } else {
+            } else
                 p.setAllowFlight(isAllowedFlight);
-            }
             
             PMessage pm = new PMessage(this.main, "bungee.player.update.isAllowedFlight");
             pm.put(p.getName());
@@ -80,9 +81,8 @@ implements CommandExecutor {
             
             if (p != null) {
                 senderUUID = p.getUniqueId().toString();
-                if (!this.main.getPlayerHandler().checkPermission(p, "ctsuite.command.fly.others")) {
+                if (!this.main.getPlayerHandler().checkPermission(p, "ctsuite.command.fly.others"))
                     return true;
-                }
             }
             
             if ((target != null) && (target.isOnline())) {                
@@ -90,12 +90,10 @@ implements CommandExecutor {
                 argFalse = Boolean.valueOf((args.length > 1) && ((args[1].equals("off")) || (args[1].equals("no")) || (args[1].equals("false"))));
                 
                 if (args.length > 1) {
-                    if (argTrue) {
+                    if (argTrue)
                         isAllowedFlight = true;
-                    }
-                    if (argFalse) {
+                    if (argFalse)
                         isAllowedFlight = false;
-                    }
                 }
                 
                 if (isAllowedFlight == null) {
@@ -109,15 +107,17 @@ implements CommandExecutor {
                         target.setAllowFlight(true);
                         isAllowedFlight = true;
                     }
-                } else {
+                } else
                     target.setAllowFlight(isAllowedFlight);
-                }
                 
                 applyViaBungee = false;
             }
             
             if (senderUUID.equals("CONSOLE")) {
-                this.main.getLogger().info("[CTSuite]: Fly-Mode für Spieler " + targetName + " " + (isAllowedFlight ? "aktiviert" : "deaktiviert"));
+            	if (isAllowedFlight != null)
+            		this.main.getLogger().info("[CTSuite]: Fly-Mode für Spieler " + targetName + " " + (isAllowedFlight ? "aktiviert" : "deaktiviert"));
+            	else
+            		this.main.getLogger().info("[CTSuite]: Fly-Mode für Spieler " + targetName + " umgeschaltet");
             }
             
             PMessage pm = new PMessage(this.main, "bungee.player.update.isAllowedFlight");
@@ -125,8 +125,58 @@ implements CommandExecutor {
             pm.put(senderUUID);
             pm.put(isAllowedFlight != null ? (isAllowedFlight ? "on" : "off") : "toggle");
             pm.put(applyViaBungee ? "true" : "false");
-            pm.send(p);
+            pm.send((p == null) ? null : p);
         }
         return true;
     }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+	public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {		
+		if (cmd.getName().equalsIgnoreCase("fly")) {
+			Player p = null;
+			List<String> newList = new ArrayList<String>();
+			List<String> proposals = new ArrayList<String>();
+			
+			Boolean hasPermFly = false;
+			Boolean hasPermFlyOthers = false;
+			
+			if (sender instanceof Player)
+				p = (Player) sender;
+			
+			// Resolve Permissions
+			if (p == null || main.getPlayerHandler().hasPermission(p, "ctsuite.command.fly"))
+				hasPermFly = true;
+			
+			if (p == null || main.getPlayerHandler().hasPermission(p, "ctsuite.command.fly.others"))
+				hasPermFlyOthers = true;
+			
+			// Setting up proposals			
+			if ((args.length == 1 || args.length == 2) && hasPermFly) {
+				proposals.add("on");
+				proposals.add("off");
+			}
+			
+			if (args.length == 1 && hasPermFlyOthers) {
+				for (String name : main.getPlayerHandler().bungeeOnlinePlayers.values()) {
+					newList.add(name);
+				}
+			}
+			
+			// Building `newList`
+			if (args[args.length -1].equals(""))
+				newList = proposals;
+			else {
+				for (String value : proposals) {
+					if (value.toLowerCase().startsWith(args[args.length -1].toLowerCase())) {
+						newList.add(value);
+					}
+				}
+			}
+			
+			Collections.sort(newList);
+			return newList;
+		}
+		
+		return null;
+	}
 }

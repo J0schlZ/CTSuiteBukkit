@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -16,11 +17,12 @@ import de.crafttogether.ctsuite.bukkit.commands.FlyCommand;
 import de.crafttogether.ctsuite.bukkit.events.PlayerJoinListener;
 import de.crafttogether.ctsuite.bukkit.events.PlayerToggleFlightListener;
 import de.crafttogether.ctsuite.bukkit.handlers.PlayerHandler;
+import de.crafttogether.ctsuite.bukkit.util.PMessage;
 import de.crafttogether.ctsuite.bukkit.util.PMessageListener;
 import net.milkbowl.vault.chat.Chat;
 
 public class CTSuite extends JavaPlugin {
-    private static CTSuite instance;
+    private static CTSuite plugin;
     private HikariDataSource hikari;
     private Configuration config;
     private String tablePrefix;
@@ -31,7 +33,7 @@ public class CTSuite extends JavaPlugin {
     private PlayerHandler playerHandler;
 
     public void onEnable() {
-        instance = this;
+    	plugin = this;
 
         saveDefaultConfig();
         config = getConfig();
@@ -64,6 +66,7 @@ public class CTSuite extends JavaPlugin {
         getServer().getMessenger().registerOutgoingPluginChannel(this, "ctsuite:bungee");
         getServer().getMessenger().registerIncomingPluginChannel(this, "ctsuite:bukkit", new PMessageListener(this));
 
+        this.getCommand("fly").setTabCompleter(new FlyCommand(this));
         this.getCommand("fly").setExecutor(new FlyCommand(this));
     }
 
@@ -71,9 +74,7 @@ public class CTSuite extends JavaPlugin {
         if (hikari != null) {
             try {
                 hikari.close();
-            } catch (Exception ex) {
-                System.out.println(ex);
-            }
+            } catch (Exception e) { }
         }
     }
 
@@ -103,6 +104,6 @@ public class CTSuite extends JavaPlugin {
     }
 
     public static CTSuite getInstance() {
-        return instance;
+        return plugin;
     }
 }
