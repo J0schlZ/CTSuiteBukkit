@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 import de.crafttogether.ctsuite.bukkit.CTSuite;
@@ -71,6 +72,13 @@ public class PlayerHandler {
                 } else
                     p.setAllowFlight(false);
 
+                // Set GameMode
+                try {
+                	GameMode gm = GameMode.valueOf(resultSet.getString("gamemode"));
+                	if (gm != null)	p.setGameMode(gm);
+                } catch (Exception e) { }
+
+                
             } else {
                 p.sendMessage("[CTSuiteBukkit]: Hab dich leider nicht gefunden! Jaa dieser Fall kann auftreten. :(");
             }
@@ -137,7 +145,26 @@ public class PlayerHandler {
     public void setIsAllowedFlight(String uuid, Boolean isAllowedFlight) {
         Player p = getOnlinePlayer(uuid);
 
-        if (p != null)
+        if (p != null) {
             p.setAllowFlight(isAllowedFlight);
+            
+            if (!isAllowedFlight && p.isFlying())
+            	p.setFlying(false);
+        }
+    }
+
+    public void setGameMode(String uuid, String strGameMode) {
+        Player p = getOnlinePlayer(uuid);
+        GameMode gm = null;
+        
+        switch(strGameMode.toUpperCase()) {
+        	case "SURVIVAL": gm = GameMode.SURVIVAL; break;
+        	case "CREATIVE": gm = GameMode.CREATIVE; break;
+        	case "ADVENTURE": gm = GameMode.ADVENTURE; break;
+        	case "SPECTATOR": gm = GameMode.SPECTATOR; break;
+        }
+      
+        if (p != null && gm != null)
+            p.setGameMode(gm);
     }
 }

@@ -64,6 +64,14 @@ public class PMessageListener implements PluginMessageListener {
                  */
                 main.getPlayerHandler().setIsAllowedFlight(values.get(0), (values.get(1).equals("true") ? true : false));
                 break;
+
+            case "bukkit.player.set.gameMode":
+                /*
+                 * 0 => (str)	uuid
+                 * 1 => (bool)	isAllowedFlight
+                 */
+                main.getPlayerHandler().setGameMode(values.get(0), values.get(1));
+                break;
         }
     }
 }

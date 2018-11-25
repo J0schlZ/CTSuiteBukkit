@@ -6,18 +6,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.zaxxer.hikari.HikariDataSource;
 
 import de.crafttogether.ctsuite.bukkit.commands.FlyCommand;
+import de.crafttogether.ctsuite.bukkit.commands.GameModeCommand;
 import de.crafttogether.ctsuite.bukkit.events.PlayerJoinListener;
 import de.crafttogether.ctsuite.bukkit.events.PlayerToggleFlightListener;
 import de.crafttogether.ctsuite.bukkit.handlers.PlayerHandler;
-import de.crafttogether.ctsuite.bukkit.util.PMessage;
 import de.crafttogether.ctsuite.bukkit.util.PMessageListener;
 import net.milkbowl.vault.chat.Chat;
 
@@ -66,8 +66,13 @@ public class CTSuite extends JavaPlugin {
         getServer().getMessenger().registerOutgoingPluginChannel(this, "ctsuite:bungee");
         getServer().getMessenger().registerIncomingPluginChannel(this, "ctsuite:bukkit", new PMessageListener(this));
 
-        this.getCommand("fly").setTabCompleter(new FlyCommand(this));
-        this.getCommand("fly").setExecutor(new FlyCommand(this));
+        this.registerCommand("fly", new FlyCommand(this));
+        this.registerCommand("gamemode", new GameModeCommand(this));
+    }
+    
+    public void registerCommand(String cmd, TabExecutor executor) {
+    	this.getCommand(cmd).setExecutor(executor);
+    	this.getCommand(cmd).setTabCompleter(executor);
     }
 
     public void onDisable() {

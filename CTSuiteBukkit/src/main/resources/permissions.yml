@@ -1,2 +1,12 @@
 ctsuite.command.fly
 ctsuite.command.fly.others
+ctsuite.command.gamemode
+ctsuite.command.gamemode.survival
+ctsuite.command.gamemode.creative
+ctsuite.command.gamemode.adventure
+ctsuite.command.gamemode.spectator
+ctsuite.command.gamemode.others
+ctsuite.command.gamemode.others.survival
+ctsuite.command.gamemode.others.creative
+ctsuite.command.gamemode.others.adventure
+ctsuite.command.gamemode.others.spectator

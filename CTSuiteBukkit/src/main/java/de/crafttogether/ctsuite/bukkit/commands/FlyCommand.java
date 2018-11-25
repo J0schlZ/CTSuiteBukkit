@@ -1,7 +1,6 @@
 package de.crafttogether.ctsuite.bukkit.commands;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -10,9 +9,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-
 import de.crafttogether.ctsuite.bukkit.CTSuite;
 import de.crafttogether.ctsuite.bukkit.util.PMessage;
 
@@ -130,7 +126,6 @@ public class FlyCommand implements TabExecutor {
         return true;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {		
 		if (cmd.getName().equalsIgnoreCase("fly")) {
 			Player p = null;
@@ -142,27 +137,23 @@ public class FlyCommand implements TabExecutor {
 			
 			if (sender instanceof Player)
 				p = (Player) sender;
-			
-			// Resolve Permissions
+
 			if (p == null || main.getPlayerHandler().hasPermission(p, "ctsuite.command.fly"))
 				hasPermFly = true;
 			
 			if (p == null || main.getPlayerHandler().hasPermission(p, "ctsuite.command.fly.others"))
 				hasPermFlyOthers = true;
-			
-			// Setting up proposals			
+		
 			if ((args.length == 1 || args.length == 2) && hasPermFly) {
 				proposals.add("on");
 				proposals.add("off");
 			}
 			
 			if (args.length == 1 && hasPermFlyOthers) {
-				for (String name : main.getPlayerHandler().bungeeOnlinePlayers.values()) {
-					newList.add(name);
-				}
+				for (String name : main.getPlayerHandler().bungeeOnlinePlayers.values())
+					proposals.add(name);
 			}
 			
-			// Building `newList`
 			if (args[args.length -1].equals(""))
 				newList = proposals;
 			else {
@@ -172,8 +163,7 @@ public class FlyCommand implements TabExecutor {
 					}
 				}
 			}
-			
-			Collections.sort(newList);
+
 			return newList;
 		}
 		
