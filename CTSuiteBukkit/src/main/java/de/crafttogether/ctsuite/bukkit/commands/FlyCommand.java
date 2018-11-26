@@ -28,8 +28,8 @@ public class FlyCommand implements TabExecutor {
             p = Bukkit.getPlayer(((Player) sender).getUniqueId());
         }
         
-        Boolean argTrue = Boolean.valueOf((args.length > 0) && ((args[0].equals("on")) || (args[0].equals("yes")) || (args[0].equals("true"))));
-        Boolean argFalse = Boolean.valueOf((args.length > 0) && ((args[0].equals("off")) || (args[0].equals("no")) || (args[0].equals("false"))));
+        Boolean argTrue = Boolean.valueOf((args.length == 1) && ((args[0].equals("on")) || (args[0].equals("yes")) || (args[0].equals("true"))));
+        Boolean argFalse = Boolean.valueOf((args.length == 1) && ((args[0].equals("off")) || (args[0].equals("no")) || (args[0].equals("false"))));
         
         if ((args.length < 1) || (argTrue) || (argFalse)) {
             if (p == null) {
@@ -83,16 +83,17 @@ public class FlyCommand implements TabExecutor {
                     return true;
             }
             
+            argTrue = Boolean.valueOf((args.length > 1) && ((args[0].equals("on")) || (args[0].equals("yes")) || (args[0].equals("true"))));
+            argFalse = Boolean.valueOf((args.length > 1) && ((args[0].equals("off")) || (args[0].equals("no")) || (args[0].equals("false"))));
+            
+            if (argTrue || argFalse)
+            	targetName = args[1];
+            
             if ((target != null) && (target.isOnline())) {                
-                argTrue = Boolean.valueOf((args.length > 1) && ((args[1].equals("on")) || (args[1].equals("yes")) || (args[1].equals("true"))));
-                argFalse = Boolean.valueOf((args.length > 1) && ((args[1].equals("off")) || (args[1].equals("no")) || (args[1].equals("false"))));
-                
-                if (args.length > 1) {
-                    if (argTrue)
-                        isAllowedFlight = true;
-                    if (argFalse)
-                        isAllowedFlight = false;
-                }
+                if (argTrue)
+                	isAllowedFlight = true;
+                if (argFalse)
+                    isAllowedFlight = false;
                 
                 if (isAllowedFlight == null) {
                     isAllowedFlight = Boolean.valueOf(target.getAllowFlight());
@@ -147,9 +148,19 @@ public class FlyCommand implements TabExecutor {
 			if (p == null || main.getPlayerHandler().hasPermission(p, "ctsuite.command.fly.others"))
 				hasPermFlyOthers = true;
 		
-			if ((args.length == 1 || args.length == 2) && hasPermFly) {
-				proposals.add("on");
-				proposals.add("off");
+			if (args.length == 1 && hasPermFly) {
+	            proposals.add("on");
+	            proposals.add("off");
+			}
+		
+			if (args.length == 2 && hasPermFlyOthers) {
+	            Boolean argTrue = Boolean.valueOf((args[0].equals("on")) || (args[0].equals("yes")) || (args[0].equals("true")));
+	            Boolean argFalse = Boolean.valueOf((args[0].equals("off")) || (args[0].equals("no")) || (args[0].equals("false")));
+	            
+	            if (!argTrue && !argFalse) {
+	            	proposals.add("on");
+	            	proposals.add("off");
+	            }
 			}
 			
 			if (args.length == 1 && hasPermFlyOthers) {

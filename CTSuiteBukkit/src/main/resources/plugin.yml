@@ -7,7 +7,7 @@ description: An essential plugin for BungeeCord
 commands:
    fly:
      description: Toggle Flymode
-     usage: /fly [on|off] [player]
+     usage: /fly [on/off/player] [on/off]
    gamemode:
      description: Change Gamemode
      usage: /gamemode <gamemode> [player]

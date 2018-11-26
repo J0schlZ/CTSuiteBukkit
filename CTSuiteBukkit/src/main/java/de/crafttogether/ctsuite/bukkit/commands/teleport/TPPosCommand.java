@@ -81,7 +81,7 @@ public class TPPosCommand implements TabExecutor {
     
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {		
-		if (cmd.getName().equalsIgnoreCase("gamemode") || cmd.getName().equalsIgnoreCase("gm")) {
+		if (cmd.getName().equalsIgnoreCase("tppos")) {
 			Player p = null;
 			List<String> proposals = new ArrayList<String>();
 			List<String> newList = new ArrayList<String>();
@@ -92,6 +92,8 @@ public class TPPosCommand implements TabExecutor {
 			if (p == null || main.getPlayerHandler().hasPermission(p, "ctsuite.command.tppos"))
 				return null;
 
+			System.out.println("YO!");
+			
 			switch (args.length) {
 				case 1: proposals.add(""+ p.getLocation().getX()); break;
 				case 2: proposals.add(""+ p.getLocation().getY()); break;

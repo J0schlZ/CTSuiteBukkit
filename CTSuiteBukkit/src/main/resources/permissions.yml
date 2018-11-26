@@ -10,3 +10,6 @@ ctsuite.command.gamemode.others.survival
 ctsuite.command.gamemode.others.creative
 ctsuite.command.gamemode.others.adventure
 ctsuite.command.gamemode.others.spectator
+ctsuite.command.tp
+ctsuite.command.tphere
+ctsuite.command.tpppos

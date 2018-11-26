@@ -110,7 +110,7 @@ public class PlayerHandler {
 
     public boolean checkPermission(Player p, String perm) {
         if (hasPermission(p, perm)) {
-            System.out.println("PermissionCheck for player " + p.getName() + " -> true");
+            System.out.println("PermissionCheck for player " + p.getName() + " (" + perm + ") -> true");
             return true;
         }
 
