@@ -71,8 +71,8 @@ public class GameModeCommand implements TabExecutor {
             p.setGameMode(gameMode);
             
             PMessage pm = new PMessage(this.main, "bungee.player.cmd.gamemode");
-            pm.put(p.getName());
             pm.put(uuid);
+            pm.put(p.getName());
             pm.put(gameMode.toString());
             pm.put("false");
             pm.send(p);
@@ -102,8 +102,8 @@ public class GameModeCommand implements TabExecutor {
             	this.main.getLogger().info("[CTSuite]: Set Gamemode '" + gameMode.toString() + "' for player " + targetName);
             
             PMessage pm = new PMessage(this.main, "bungee.player.cmd.gamemode");
-            pm.put(targetName);
             pm.put(senderUUID);
+            pm.put(targetName);
             pm.put(gameMode.toString());
             pm.put(applyViaBungee ? "true" : "false");
             pm.send((p == null) ? null : p);

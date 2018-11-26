@@ -43,12 +43,10 @@ public class FlyCommand implements TabExecutor {
             String uuid = p.getUniqueId().toString();
             Boolean isAllowedFlight = null;
             
-            if (args.length > 0) {
-                if (argTrue)
-                    isAllowedFlight = true;
-                if (argFalse)
-                    isAllowedFlight = false;
-            }
+            if (argTrue)
+                isAllowedFlight = true;
+            if (argFalse)
+                isAllowedFlight = false;
             
             if (isAllowedFlight == null) {
                 isAllowedFlight = Boolean.valueOf(p.getAllowFlight());
@@ -65,8 +63,8 @@ public class FlyCommand implements TabExecutor {
                 p.setAllowFlight(isAllowedFlight);
             
             PMessage pm = new PMessage(this.main, "bungee.player.cmd.fly");
-            pm.put(p.getName());
             pm.put(uuid);
+            pm.put(p.getName());
             pm.put(isAllowedFlight ? "on" : "off");
             pm.put("false");
             pm.send(p);
@@ -75,7 +73,7 @@ public class FlyCommand implements TabExecutor {
             Boolean applyViaBungee = true;
             String senderUUID = "CONSOLE";
             String targetName = args[0];
-            Player target = Bukkit.getPlayer(targetName);
+            Player target = null;
             
             if (p != null) {
                 senderUUID = p.getUniqueId().toString();
@@ -88,6 +86,14 @@ public class FlyCommand implements TabExecutor {
             
             if (argTrue || argFalse)
             	targetName = args[1];
+            
+            if (argTrue)
+                isAllowedFlight = true;
+            
+            if (argFalse)
+                isAllowedFlight = false;
+            
+            target = Bukkit.getPlayer(targetName);
             
             if ((target != null) && (target.isOnline())) {                
                 if (argTrue)
@@ -120,8 +126,8 @@ public class FlyCommand implements TabExecutor {
             }
             
             PMessage pm = new PMessage(this.main, "bungee.player.cmd.fly");
-            pm.put(targetName);
             pm.put(senderUUID);
+            pm.put(targetName);
             pm.put(isAllowedFlight != null ? (isAllowedFlight ? "on" : "off") : "toggle");
             pm.put(applyViaBungee ? "true" : "false");
             pm.send((p == null) ? null : p);
@@ -151,21 +157,21 @@ public class FlyCommand implements TabExecutor {
 			if (args.length == 1 && hasPermFly) {
 	            proposals.add("on");
 	            proposals.add("off");
+	            
+	            if (hasPermFlyOthers) {
+					for (HashMap<String, String> player : main.getPlayerHandler().bungeeOnlinePlayers.values())
+						proposals.add(player.get("name"));
+	            }
 			}
 		
 			if (args.length == 2 && hasPermFlyOthers) {
-	            Boolean argTrue = Boolean.valueOf((args[0].equals("on")) || (args[0].equals("yes")) || (args[0].equals("true")));
-	            Boolean argFalse = Boolean.valueOf((args[0].equals("off")) || (args[0].equals("no")) || (args[0].equals("false")));
-	            
-	            if (!argTrue && !argFalse) {
-	            	proposals.add("on");
-	            	proposals.add("off");
-	            }
-			}
-			
-			if (args.length == 1 && hasPermFlyOthers) {
-				for (HashMap<String, String> player : main.getPlayerHandler().bungeeOnlinePlayers.values())
-					proposals.add(player.get("name"));
+				Boolean argTrue = Boolean.valueOf((args[0].equals("on")) || (args[0].equals("yes")) || (args[0].equals("true")));
+				Boolean argFalse = Boolean.valueOf((args[0].equals("off")) || (args[0].equals("no")) || (args[0].equals("false")));
+				
+				if (argTrue || argFalse) {
+					for (HashMap<String, String> player : main.getPlayerHandler().bungeeOnlinePlayers.values())
+						proposals.add(player.get("name"));
+				}
 			}
 			
 			if (args[args.length -1].equals(""))

@@ -27,34 +27,35 @@ public class TPPosCommand implements TabExecutor {
         Player p = null;
         Player target = null;
         World world = null;
-        String worldName = p.getWorld().getName();
-        String serverName = p.getServer().getName();
         
         if (sender instanceof Player)
             p = Bukkit.getPlayer(((Player) sender).getUniqueId());
 
-        if (args.length != 3 || !args[0].matches("[0-9.]+") || !args[1].matches("[0-9.]+") || !args[2].matches("[0-9.]+"))
-        	return false;
-        
         if (p == null) {
             this.main.getLogger().log(Level.INFO, "[CTSuite]: This command can't performed by Console");
             return true;
         }
         
-        if (!this.main.getPlayerHandler().checkPermission(p, "ctsuite.command.tppos"))
+        String worldName = p.getWorld().getName();
+        String serverName = p.getServer().getName();
+        
+        if (args.length < 3 || !args[0].matches("[0-9.-]+") || !args[1].matches("[0-9.-]+") || !args[2].matches("[0-9.-]+"))
+        	return false;
+        
+        if (!main.getPlayerHandler().checkPermission(p, "ctsuite.command.tppos"))
             return true;
 
-        if (args[4] != null)
+        if (args.length > 4 && args[4] != null)
         	serverName = args[4];
         
-        if (args[3] != null)
+        if (args.length > 3 && args[3] != null)
         	worldName = args[3];
         
         String x = args[0];
         String y = args[1];
         String z = args[2];
-        String pitch = (!args[5].matches("[0-9.]+")) ? null : args[5];
-        String yaw = (!args[6].matches("[0-9.]+")) ? null : args[6];
+        String pitch = (!args[5].matches("[0-9.-]+")) ? null : args[5];
+        String yaw = (!args[6].matches("[0-9.-]+")) ? null : args[6];
         
         String strLocation = serverName + ":" + worldName + ":" + x + ":" + y + ":" + z + ":" + pitch + ":" + yaw;        
         world = Bukkit.getWorld(worldName);
@@ -89,21 +90,19 @@ public class TPPosCommand implements TabExecutor {
 			if (sender instanceof Player)
 				p = (Player) sender;
 			
-			if (p == null || main.getPlayerHandler().hasPermission(p, "ctsuite.command.tppos"))
+			if (p == null || !main.getPlayerHandler().hasPermission(p, "ctsuite.command.tppos"))
 				return null;
-
-			System.out.println("YO!");
 			
 			switch (args.length) {
-				case 1: proposals.add(""+ p.getLocation().getX()); break;
-				case 2: proposals.add(""+ p.getLocation().getY()); break;
-				case 3: proposals.add(""+ p.getLocation().getZ()); break;
+				case 1: proposals.add(""+ Math.round(p.getLocation().getX() *10) / 10.0); break;
+				case 2: proposals.add(""+ Math.round(p.getLocation().getY() *10) / 10.0); break;
+				case 3: proposals.add(""+ Math.round(p.getLocation().getZ() *10) / 10.0); break;
 				case 4: proposals.add(""+ p.getWorld().getName()); break;
-				case 5: proposals.add(""+ p.getServer().getName()); break;
-				case 6: proposals.add(""+ p.getLocation().getYaw()); break;
-				case 7: proposals.add(""+ p.getLocation().getPitch()); break;
+				case 5: proposals.add(""+ Bukkit.getServerName()); break;
+				case 6: proposals.add(""+ Math.round(p.getLocation().getPitch() *10) / 10.0); break;
+				case 7: proposals.add(""+ Math.round(p.getLocation().getYaw() *10) / 10.0); break;
 			}
-
+			
 			if (args[args.length -1].equals(""))
 				newList = proposals;
 			else {

@@ -17,7 +17,7 @@ All commands are progressed on the Bukkit-side and also usable in command-blocks
 
 Command | Parameters
 ------------ | -------------
-/fly | *[on/off] [player]*
+/fly | *[on/off/player] [on/off]*
 /gamemode | *<gamemode> [player]*
 /tp | *[player]*
 /tphere | *[player]*
