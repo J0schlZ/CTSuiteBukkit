@@ -1,7 +1,6 @@
 package de.crafttogether.ctsuite.bukkit.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -43,19 +42,31 @@ public class PMessageListener implements PluginMessageListener {
 
         switch (messageName) {
         
-        	case "bukkit.data.update.onlinePlayers":
-        		/*
-        		 * 0 => (str)	uuid:name
-        		 * 1 => (str)	uuid:name,
-        		 * 2 => ...	
-        		 */
-        		HashMap<String, String> newList = new HashMap<String, String>();
-        		for (String value : values) {
-        			String[] splitted = value.split(":");
-        			newList.put(splitted[0], splitted[1]);
-        		}
-        		main.getPlayerHandler().bungeeOnlinePlayers = newList;
-        		break;
+    	case "bukkit.data.update.onlinePlayers":
+    		/*
+    		 * 0 => (str)	uuid:name:server
+    		 * 1 => (str)	uuid:name:server,
+    		 * 2 => ...	
+    		 */
+    		main.getPlayerHandler().updateOnlinePlayers(values);
+    		break;
+            
+    	case "bukkit.data.update.playerLeaved":
+    		/*
+    		 * 0 => (str)	uuid
+    		 */
+    		if (main.getPlayerHandler().bungeeOnlinePlayers.containsKey(values.get(0)))
+    			main.getPlayerHandler().bungeeOnlinePlayers.remove(values.get(0));
+    		break;
+            
+    	case "bukkit.data.update.playerServer":
+    		/*
+    		 * 0 => (str)	uuid
+    		 * 1 => (str)	server
+    		 */
+    		if (main.getPlayerHandler().bungeeOnlinePlayers.containsKey(values.get(0)))
+    			main.getPlayerHandler().bungeeOnlinePlayers.get(values.get(0)).put("server", values.get(1));
+    		break;
 
             case "bukkit.player.set.isAllowedFlight":
                 /*
@@ -68,7 +79,7 @@ public class PMessageListener implements PluginMessageListener {
             case "bukkit.player.set.gameMode":
                 /*
                  * 0 => (str)	uuid
-                 * 1 => (bool)	isAllowedFlight
+                 * 1 => (bool)	gameMode
                  */
                 main.getPlayerHandler().setGameMode(values.get(0), values.get(1));
                 break;

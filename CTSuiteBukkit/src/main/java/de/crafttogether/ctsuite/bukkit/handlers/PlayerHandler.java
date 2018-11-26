@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -17,11 +18,11 @@ import de.crafttogether.ctsuite.bukkit.util.PMessage;
 public class PlayerHandler {
     private CTSuite main;
     
-    public HashMap<String, String> bungeeOnlinePlayers;
+    public HashMap<String, HashMap<String, String>> bungeeOnlinePlayers;
     
     public PlayerHandler(CTSuite main) {
         this.main = main;
-        this.bungeeOnlinePlayers = new HashMap<String, String>();
+        this.bungeeOnlinePlayers = new HashMap<String, HashMap<String, String>>();
     }
 
     public void registerLogin(Player p) {
@@ -167,4 +168,16 @@ public class PlayerHandler {
         if (p != null && gm != null)
             p.setGameMode(gm);
     }
+
+	public void updateOnlinePlayers(ArrayList<String> values) {
+		HashMap<String, HashMap<String, String>> newList = new HashMap<String, HashMap<String, String>>();
+		for (String value : values) {
+			String[] splitted = value.split(":");
+			HashMap <String, String> playerObj = new HashMap <String, String>();
+			playerObj.put("name", splitted[1]);
+			playerObj.put("server", splitted[2]);
+			newList.put(splitted[0], playerObj);
+		}
+		main.getPlayerHandler().bungeeOnlinePlayers = newList;
+	}
 }

@@ -17,11 +17,11 @@ public class PlayerJoinListener implements Listener {
     public PlayerJoinListener(CTSuite main) {
         this.main = main;
     }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
+    
+	@EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent ev) {
         Player p = ev.getPlayer();
-
+        
         Chat chat = main.getChat();
         String prefix = null;
         String suffix = null;
@@ -33,17 +33,19 @@ public class PlayerJoinListener implements Listener {
 	        } catch (Exception ex) { }
         }
 
-        final String fPrefix = (prefix != null && !prefix.equals("")) ? prefix : null;
-        final String fSuffix = (suffix != null && !suffix.equals("")) ? suffix : null;
+        final String fPrefix = (prefix != null) ? prefix : "";
+        final String fSuffix = (suffix != null) ? suffix : "";
 
         main.getPlayerHandler().registerLogin(ev.getPlayer());
 
         new BukkitRunnable() {
             public void run() {
-                PMessage pm = new PMessage(main, "bungee.player.updatePrefixSuffix");
+                PMessage pm = new PMessage(main, "bungee.player.update.joined");
                 pm.put(p.getUniqueId().toString());
-                pm.put("prefix - " + fPrefix);
-                pm.put("suffix - " + fSuffix);
+                pm.put(p.getServer().getName());
+                pm.put(p.getWorld().getName());
+                pm.put(fPrefix);
+                pm.put(fSuffix);
                 pm.send(p);
             }
         }.runTaskLater(main, 20L);

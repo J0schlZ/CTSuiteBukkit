@@ -28,6 +28,7 @@ public class GameModeCommand implements TabExecutor {
         this.validModes.put(4, "SPECTATOR");
     }
 
+	@Override
     public boolean onCommand(CommandSender sender, Command cmd, String st, String[] args) {
         Player p = null;
         GameMode gameMode = null;
@@ -69,7 +70,7 @@ public class GameModeCommand implements TabExecutor {
             String uuid = p.getUniqueId().toString();
             p.setGameMode(gameMode);
             
-            PMessage pm = new PMessage(this.main, "bungee.player.update.gameMode");
+            PMessage pm = new PMessage(this.main, "bungee.player.cmd.gamemode");
             pm.put(p.getName());
             pm.put(uuid);
             pm.put(gameMode.toString());
@@ -98,9 +99,9 @@ public class GameModeCommand implements TabExecutor {
             }
             
             if (senderUUID.equals("CONSOLE"))
-            	this.main.getLogger().info("[CTSuite]: Setze GameMode '" + gameMode.toString() + "' für Spieler " + targetName);
+            	this.main.getLogger().info("[CTSuite]: Set Gamemode '" + gameMode.toString() + "' for player " + targetName);
             
-            PMessage pm = new PMessage(this.main, "bungee.player.update.gameMode");
+            PMessage pm = new PMessage(this.main, "bungee.player.cmd.gamemode");
             pm.put(targetName);
             pm.put(senderUUID);
             pm.put(gameMode.toString());
@@ -111,6 +112,7 @@ public class GameModeCommand implements TabExecutor {
         return true;
     }
 
+	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {		
 		if (cmd.getName().equalsIgnoreCase("gamemode") || cmd.getName().equalsIgnoreCase("gm")) {
 			Player p = null;
@@ -145,8 +147,8 @@ public class GameModeCommand implements TabExecutor {
 			}
 			
 			if (args.length == 2 && hasPermGmOthers) {
-				for (String name : main.getPlayerHandler().bungeeOnlinePlayers.values())
-					proposals.add(name);
+				for (HashMap<String, String> player : main.getPlayerHandler().bungeeOnlinePlayers.values())
+					proposals.add(player.get("name"));
 			}
 			
 			if (args[args.length -1].equals(""))

@@ -12,3 +12,9 @@ commands:
      description: Change Gamemode
      usage: /gamemode <gamemode> [player]
      alias: [gm]
+   tp:
+     description: Teleports you to another player
+     usage: /tp <player>
+   tphere:
+     description: Teleports another player to you
+     usage: /tphere <player>

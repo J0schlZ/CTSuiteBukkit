@@ -1,6 +1,7 @@
 package de.crafttogether.ctsuite.bukkit.commands;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -19,6 +20,7 @@ public class FlyCommand implements TabExecutor {
         this.main = main;
     }
 
+	@Override
     public boolean onCommand(CommandSender sender, Command cmd, String st, String[] args) {
         Player p = null;
         
@@ -62,7 +64,7 @@ public class FlyCommand implements TabExecutor {
             } else
                 p.setAllowFlight(isAllowedFlight);
             
-            PMessage pm = new PMessage(this.main, "bungee.player.update.isAllowedFlight");
+            PMessage pm = new PMessage(this.main, "bungee.player.cmd.fly");
             pm.put(p.getName());
             pm.put(uuid);
             pm.put(isAllowedFlight ? "on" : "off");
@@ -111,12 +113,12 @@ public class FlyCommand implements TabExecutor {
             
             if (senderUUID.equals("CONSOLE")) {
             	if (isAllowedFlight != null)
-            		this.main.getLogger().info("[CTSuite]: Fly-Mode für Spieler " + targetName + " " + (isAllowedFlight ? "aktiviert" : "deaktiviert"));
+            		this.main.getLogger().info("[CTSuite]: Fly-Mode " + (isAllowedFlight ? "enabled" : "disabled") + " for player" + targetName);
             	else
-            		this.main.getLogger().info("[CTSuite]: Fly-Mode für Spieler " + targetName + " umgeschaltet");
+            		this.main.getLogger().info("[CTSuite]: Fly-Mode toggled for player " + targetName);
             }
             
-            PMessage pm = new PMessage(this.main, "bungee.player.update.isAllowedFlight");
+            PMessage pm = new PMessage(this.main, "bungee.player.cmd.fly");
             pm.put(targetName);
             pm.put(senderUUID);
             pm.put(isAllowedFlight != null ? (isAllowedFlight ? "on" : "off") : "toggle");
@@ -126,6 +128,7 @@ public class FlyCommand implements TabExecutor {
         return true;
     }
 
+	@Override
 	public List<String> onTabComplete(CommandSender sender, Command cmd, String alias, String[] args) {		
 		if (cmd.getName().equalsIgnoreCase("fly")) {
 			Player p = null;
@@ -150,8 +153,8 @@ public class FlyCommand implements TabExecutor {
 			}
 			
 			if (args.length == 1 && hasPermFlyOthers) {
-				for (String name : main.getPlayerHandler().bungeeOnlinePlayers.values())
-					proposals.add(name);
+				for (HashMap<String, String> player : main.getPlayerHandler().bungeeOnlinePlayers.values())
+					proposals.add(player.get("name"));
 			}
 			
 			if (args[args.length -1].equals(""))
