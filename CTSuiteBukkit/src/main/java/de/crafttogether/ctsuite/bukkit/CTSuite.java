@@ -2,119 +2,148 @@ package de.crafttogether.ctsuite.bukkit;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.zaxxer.hikari.HikariDataSource;
 
 import de.crafttogether.ctsuite.bukkit.commands.FlyCommand;
-import de.crafttogether.ctsuite.bukkit.commands.GameModeCommand;
-import de.crafttogether.ctsuite.bukkit.commands.teleport.TPCommand;
-import de.crafttogether.ctsuite.bukkit.commands.teleport.TPHereCommand;
-import de.crafttogether.ctsuite.bukkit.commands.teleport.TPPosCommand;
 import de.crafttogether.ctsuite.bukkit.events.PlayerJoinListener;
-import de.crafttogether.ctsuite.bukkit.events.PlayerToggleFlightListener;
+import de.crafttogether.ctsuite.bukkit.events.WorldListener;
 import de.crafttogether.ctsuite.bukkit.handlers.PlayerHandler;
-import de.crafttogether.ctsuite.bukkit.util.PMessageListener;
+import de.crafttogether.ctsuite.bukkit.handlers.WorldHandler;
+import de.crafttogether.ctsuite.bukkit.messaging.adapter.Sockets4MC;
 import net.milkbowl.vault.chat.Chat;
 
-public class CTSuite extends JavaPlugin {
+public class CTSuite extends JavaPlugin
+{
     private static CTSuite plugin;
     private HikariDataSource hikari;
     private Configuration config;
-    private String tablePrefix;
+    private MultiverseCore multiverse;
     private Chat chat;
+    private String tablePrefix;
+    private String messagingService;
     private boolean vaultLoaded;
-    private Logger log;
-
+    private boolean MVLoaded;
     private PlayerHandler playerHandler;
-
+    private WorldHandler worldHandler;
+    
     public void onEnable() {
-    	plugin = this;
-
-        saveDefaultConfig();
-        config = getConfig();
-        log = Bukkit.getLogger();
-
-        hikari = new HikariDataSource();
-        hikari.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
-        hikari.addDataSourceProperty("serverName", config.get("MySQL.host"));
-        hikari.addDataSourceProperty("port", config.get("MySQL.port"));
-        hikari.addDataSourceProperty("databaseName", config.get("MySQL.database"));
-        hikari.addDataSourceProperty("user", config.get("MySQL.user"));
-        hikari.addDataSourceProperty("password", config.get("MySQL.password"));
-        tablePrefix = config.getString("MySQL.prefix");
-
-        // Chef if Vault is loaded
-        vaultLoaded = (getServer().getPluginManager().getPlugin("Vault") != null) ? true : false;
-        if (vaultLoaded) {
-            RegisteredServiceProvider < Chat > chatProvider = getServer().getServicesManager().getRegistration(Chat.class);
-            if (chatProvider != null)
-                chat = chatProvider.getProvider();
-        } else {
-            getLog().log(Level.WARNING, "Couln't find Vault.");
+        (CTSuite.plugin = this).saveDefaultConfig();
+        this.config = (Configuration)this.getConfig();
+        (this.hikari = new HikariDataSource()).setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
+        this.hikari.addDataSourceProperty("serverName", this.config.get("MySQL.host"));
+        this.hikari.addDataSourceProperty("port", this.config.get("MySQL.port"));
+        this.hikari.addDataSourceProperty("databaseName", this.config.get("MySQL.database"));
+        this.hikari.addDataSourceProperty("user", this.config.get("MySQL.user"));
+        this.hikari.addDataSourceProperty("password", this.config.get("MySQL.password"));
+        this.messagingService = "Sockets4MC";
+        this.tablePrefix = this.config.getString("MySQL.prefix");
+        
+        this.loadPlugins();
+        
+        final String messagingService = this.messagingService;
+        switch (messagingService) {
+            case "Sockets4MC": {
+                new Sockets4MC();
+                break;
+            }
         }
-
-        playerHandler = new PlayerHandler(this);
-
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerToggleFlightListener(this), this);
-
-        getServer().getMessenger().registerOutgoingPluginChannel(this, "ctsuite:bungee");
-        getServer().getMessenger().registerIncomingPluginChannel(this, "ctsuite:bukkit", new PMessageListener(this));
-
-        this.registerCommand("fly", new FlyCommand(this));
-        this.registerCommand("gamemode", new GameModeCommand(this));
-        this.registerCommand("tp", new TPCommand(this));
-        this.registerCommand("tphere", new TPHereCommand(this));
-        this.registerCommand("tppos", new TPPosCommand(this));
+        
+        this.playerHandler = new PlayerHandler();
+        this.worldHandler = new WorldHandler();
+        
+        Bukkit.getPluginManager().registerEvents((Listener)new PlayerJoinListener(), (Plugin)this);
+        Bukkit.getPluginManager().registerEvents((Listener)new WorldListener(), (Plugin)this);
+        
+        this.registerCommand("fly", (TabExecutor)new FlyCommand());
+        this.playerHandler.readPlayersFromDB();
     }
     
-    public void registerCommand(String cmd, TabExecutor executor) {
-    	this.getCommand(cmd).setExecutor(executor);
-    	this.getCommand(cmd).setTabCompleter(executor);
-    }
-
     public void onDisable() {
-        if (hikari != null) {
+        if (this.hikari != null) {
             try {
-                hikari.close();
-            } catch (Exception e) { }
+                this.hikari.close();
+            }
+            catch (Exception ex) {}
         }
     }
-
-    public String getTablePrefix() {
-        return tablePrefix;
+    
+    public void registerCommand(final String cmd, final TabExecutor executor) {
+        this.getCommand(cmd).setExecutor((CommandExecutor)executor);
+        this.getCommand(cmd).setTabCompleter((TabCompleter)executor);
     }
-
-    public Logger getLog() {
-        return log;
+    
+    private void loadPlugins() {
+        PluginManager pm = this.getServer().getPluginManager();
+        Plugin plugin = null;
+        
+        this.vaultLoaded = (pm.getPlugin("Vault") != null);
+        if (this.vaultLoaded) {
+        	RegisteredServiceProvider<Chat> chatProvider = getServer().getServicesManager().getRegistration(Chat.class);
+            if (chatProvider != null) {
+                this.chat = (Chat)chatProvider.getProvider();
+            }
+        }
+        else
+            this.getLogger().warning("Couln't find Vault.");
+        
+        this.MVLoaded = (pm.getPlugin("Vault") != null);
+        if (this.MVLoaded) {
+            plugin = pm.getPlugin("Multiverse-Core");
+            if (plugin instanceof MultiverseCore)
+                this.multiverse = (MultiverseCore)plugin;
+            else
+                this.getLogger().warning("Couln't find Multiverse-Core.");
+        }
     }
-
-    public Chat getChat() {
-        return chat;
-    }
-
+    
     public PlayerHandler getPlayerHandler() {
-        return playerHandler;
+        return this.playerHandler;
     }
-
-    public Connection getConnection() {
+    
+    public WorldHandler getWorldHandler() {
+        return this.worldHandler;
+    }
+    
+    public Connection getMySQLConnection() {
         try {
-			return this.hikari.getConnection();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
+            return this.hikari.getConnection();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
-
+    
+    public MultiverseCore getMultiverseCore() {
+        return this.multiverse;
+    }
+    
+    public Chat getChat() {
+        return this.chat;
+    }
+    
+    public String getTablePrefix() {
+        return this.tablePrefix;
+    }
+    
+    public String getMessagingService() {
+        return this.messagingService;
+    }
+    
     public static CTSuite getInstance() {
-        return plugin;
+        return CTSuite.plugin;
     }
 }

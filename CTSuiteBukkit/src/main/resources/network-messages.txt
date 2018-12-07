@@ -1,0 +1,40 @@
+# Name								# Sender		# Receiver		
+
+# update.data.world.loaded			Bukkit			ALL
+`world`			=> (String)
+
+# update.data.world.unloaded		Bukkit			ALL
+`world`			=> (String)
+
+# update.data.world.list			Bukkit			ALL
+`worlds`		=> (ArrayList<String>)
+
+player.update.joined.server			Bukkit			ALL
+`uuid`			=> (UUID),
+`world`			=> (String),
+`prefix`		=> (String),
+`suffix`		=> (String),
+
+player.update.joined.network		Proxy			ALL
+`uuid`			=> (UUID),
+
+player.update.leaved.network		Proxy			ALL
+`uuid`			=> (UUID)
+
+player.inform.permission.denied		Bukkit			Proxy
+`targetUUID`	=> (UUID)
+`permission`	=> (String)
+
+player.inform.message.send			Bukkit			Proxy
+`targetUUID`	=> (UUID)
+`message`		=> (String)
+
+player.cmd.fly						Bukkit			Proxy
+`targetName`	=> (String)
+`senderUUID`	=> (String)
+`fly`			=> (String)
+`apply`			=> (Boolean)
+
+player.set.fly						Bukkit			Proxy
+`targetUUID`	=> (UUID)
+`fly`			=> (Boolean)

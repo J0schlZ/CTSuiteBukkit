@@ -5,49 +5,40 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import de.crafttogether.ctsuite.bukkit.CTSuite;
-import de.crafttogether.ctsuite.bukkit.util.PMessage;
+import de.crafttogether.ctsuite.bukkit.messaging.NetworkMessage;
 import net.milkbowl.vault.chat.Chat;
 
-public class PlayerJoinListener implements Listener {
-    private CTSuite main;
-
-    public PlayerJoinListener(CTSuite main) {
-        this.main = main;
+public class PlayerJoinListener implements Listener
+{
+    private CTSuite plugin;
+    
+    public PlayerJoinListener() {
+        this.plugin = CTSuite.getInstance();
     }
     
-	@EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerJoin(PlayerJoinEvent ev) {
-        Player p = ev.getPlayer();
-        
-        Chat chat = main.getChat();
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerJoin(final PlayerJoinEvent ev) {
+        final Player p = ev.getPlayer();
+        final Chat chat = this.plugin.getChat();
         String prefix = null;
         String suffix = null;
-        
         if (chat != null) {
-	        try {
-	        	prefix = main.getChat().getPlayerPrefix(p);
-	        	suffix = main.getChat().getPlayerSuffix(p);
-	        } catch (Exception ex) { }
-        }
-
-        final String fPrefix = (prefix != null) ? prefix : "";
-        final String fSuffix = (suffix != null) ? suffix : "";
-
-        main.getPlayerHandler().registerLogin(ev.getPlayer());
-
-        new BukkitRunnable() {
-            public void run() {
-                PMessage pm = new PMessage(main, "bungee.player.update.joined");
-                pm.put(p.getUniqueId().toString());
-                pm.put(p.getServer().getName());
-                pm.put(p.getWorld().getName());
-                pm.put(fPrefix);
-                pm.put(fSuffix);
-                pm.send(p);
+            try {
+                prefix = this.plugin.getChat().getPlayerPrefix(p);
+                prefix = ((prefix != null) ? prefix : "");
+                suffix = this.plugin.getChat().getPlayerSuffix(p);
+                suffix = ((suffix != null) ? suffix : "");
             }
-        }.runTaskLater(main, 20L);
+            catch (Exception ex) {}
+        }
+        this.plugin.getPlayerHandler().registerLogin(ev.getPlayer());
+        final NetworkMessage nMessage = new NetworkMessage("player.update.joined.server");
+        nMessage.put("uuid", p.getUniqueId());
+        nMessage.put("prefix", prefix);
+        nMessage.put("suffix", suffix);
+        nMessage.put("world", p.getWorld().getName());
+        nMessage.send("all");
     }
 }
