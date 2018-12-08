@@ -3,7 +3,7 @@ Bukkit side implementation of CTSuite
 
 Bungeecord: https://github.com/J0schlZ/CTSuiteBungee
 
-All commands are progressed on the Bukkit-side and also usable in command-blocks and it's possible to block them with WorldGuard!
+All commands are processed bukkit-side and they're also usable in command-blocks and it's possible to block them with WorldGuard!
 
 **Planned:**
  - Gamemode-Management
