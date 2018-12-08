@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -21,64 +22,140 @@ import de.crafttogether.ctsuite.bukkit.messaging.NetworkMessageEvent;
 public class PlayerHandler implements Listener
 {
     private CTSuite plugin;
-    public HashMap<UUID, String> uuids;
-    public HashMap<UUID, String> onlinePlayers;
+    public HashMap<UUID, String> uuids; // uuid, name
+    public HashMap<UUID, HashMap<String, Object>> onlinePlayers; // uuid, server
     
     public PlayerHandler() {
         this.plugin = CTSuite.getInstance();
         this.uuids = new HashMap<UUID, String>();
-        this.onlinePlayers = new HashMap<UUID, String>();
-        Bukkit.getPluginManager().registerEvents((Listener)this, (Plugin)this.plugin);
+        this.onlinePlayers = new HashMap<UUID, HashMap<String, Object>>();
+        Bukkit.getPluginManager().registerEvents(this, this.plugin);
     }
-    
-    @EventHandler
-    public void onNetworkMessage(final NetworkMessageEvent ev) {
-        final String messageKey = ev.getMessageKey();
+
+	@EventHandler
+    @SuppressWarnings("unchecked")
+    public void onNetworkMessage(NetworkMessageEvent ev) {
+        String messageKey = ev.getMessageKey();
         switch (messageKey) {
-            case "player.update.joined.server": {
-                this.onPlayerJoinedServer(UUID.fromString((String)ev.getValue("uuid")), (String)ev.getValue("server"), (String)ev.getValue("world"));
+        	case "update.data.players.list":
+        		this.onPlayerList(
+        			(ArrayList<String>) ev.getValue("players")
+        		);
+        	break;
+     
+            case "player.update.joined.server":
+                this.onPlayerJoinedServer(
+                	UUID.fromString((String) ev.getValue("uuid")),
+                	(String) ev.getValue("server"),
+                	(String) ev.getValue("world")
+                );
                 break;
-            }
-            case "player.update.joined.network": {
-                this.onPlayerJoinedNetwork(UUID.fromString((String)ev.getValue("uuid")));
+                
+            case "player.update.joined.network": 
+                this.onPlayerJoinedNetwork(
+                    UUID.fromString((String) ev.getValue("uuid")),
+                    (String) ev.getValue("name")
+                );
                 break;
-            }
-            case "player.update.leaved.network": {
-                this.onPlayerLeavedNetwork(UUID.fromString((String)ev.getValue("uuid")));
+            
+            case "player.update.leaved.network": 
+                this.onPlayerLeavedNetwork(
+                	UUID.fromString((String) ev.getValue("uuid"))
+                );
                 break;
-            }
-            case "player.set.fly": {
-                this.setFly(UUID.fromString((String)ev.getValue("uuid")), (Boolean)ev.getValue("fly"));
+            
+            case "player.update.world": 
+                this.onPlayerWorld(
+                	UUID.fromString((String) ev.getValue("uuid")),
+                	(String) ev.getValue("world")
+                );
                 break;
-            }
+            
+            case "player.set.fly": 
+                this.setFly(
+                	UUID.fromString((String) ev.getValue("uuid")),
+                	(Boolean) ev.getValue("fly")
+                );
+                break;
+            
+            case "player.set.gamemode": 
+                this.setGamemode(
+                	UUID.fromString((String) ev.getValue("uuid")),
+                	(String) ev.getValue("gamemode")
+                );
+                break;
         }
     }
-    
-    private void onPlayerJoinedServer(final UUID uuid, final String server, final String world) {
-        this.onlinePlayers.put(uuid, server);
+	private void onPlayerList(ArrayList<String> playerList) {
+    	// 'uuid:name:server:world'
+		this.onlinePlayers = new HashMap<UUID, HashMap<String, Object>>();
+    	for (String _playerData : playerList) {
+    		String[] playerData = _playerData.split(":");
+    		UUID uuid = UUID.fromString(playerData[0]);
+    		
+    		HashMap<String, Object> playerInfo = new HashMap<String, Object>();
+    		playerInfo.put("uuid", uuid);
+    		playerInfo.put("name", playerData[1]);
+    		playerInfo.put("server", playerData[2]);
+    		playerInfo.put("worlds", playerData[3]);
+ 
+    		this.uuids.put(uuid, playerData[1]);
+    		this.onlinePlayers.put(uuid, playerInfo);
+    	}
+	}
+
+	private void onPlayerWorld(UUID uuid, String world) {
+		if (!this.onlinePlayers.containsKey(uuid))
+    		return;
+		
+		this.onlinePlayers.get(uuid).put("world", world);
+	}
+
+	private void onPlayerJoinedServer(UUID uuid, String server, String world) {
+    	if (!this.onlinePlayers.containsKey(uuid))
+    		return;
+    	
+    	this.onlinePlayers.get(uuid).put("server", server);
+		this.onlinePlayers.get(uuid).put("world", world);
     }
     
-    private void onPlayerJoinedNetwork(final UUID uuid) {
-        this.onlinePlayers.put(uuid, null);
+    private void onPlayerJoinedNetwork(UUID uuid, String name) {
+    	HashMap<String, Object> playerInfo = new HashMap<String, Object>();
+    	playerInfo.put("uuid", uuid);
+    	playerInfo.put("name", name);
+        this.onlinePlayers.put(uuid, playerInfo);
     }
     
-    private void onPlayerLeavedNetwork(final UUID uuid) {
-        if (this.onlinePlayers.containsKey(uuid)) {
+    private void onPlayerLeavedNetwork(UUID uuid) {
+        if (this.onlinePlayers.containsKey(uuid))
             this.onlinePlayers.remove(uuid);
-        }
     }
     
-    public void setFly(final UUID uuid, final Boolean isAllowedFlight) {
-        final Player p = Bukkit.getServer().getPlayer(uuid);
+    public void setFly(UUID uuid, Boolean isAllowedFlight) {
+        Player p = Bukkit.getServer().getPlayer(uuid);
+        
         if (p != null) {
             p.setAllowFlight((boolean)isAllowedFlight);
-            if (!isAllowedFlight && p.isFlying()) {
+            if (!isAllowedFlight && p.isFlying())
                 p.setFlying(false);
-            }
         }
     }
     
-    public void registerLogin(final Player p) {
+    private void setGamemode(UUID uuid, String gamemode) {
+    	Player p = Bukkit.getServer().getPlayer(uuid);
+        GameMode gm = null;
+        
+        switch(gamemode.toUpperCase()) {
+        	case "SURVIVAL": gm = GameMode.SURVIVAL; break;
+        	case "CREATIVE": gm = GameMode.CREATIVE; break;
+        	case "ADVENTURE": gm = GameMode.ADVENTURE; break;
+        	case "SPECTATOR": gm = GameMode.SPECTATOR; break;
+        }
+      
+        if (p != null && gm != null)
+            p.setGameMode(gm);
+	}
+    public void registerLogin(Player p) {
         ResultSet resultSet = null;
         PreparedStatement statement = null;
         Connection connection = null;
@@ -103,116 +180,54 @@ public class PlayerHandler implements Listener
                         }
                         catch (SQLException e) {
                             e.printStackTrace();
-                            if (statement != null) {
-                                try {
-                                    statement.close();
-                                }
-                                catch (SQLException ex) {
-                                    ex.printStackTrace();
-                                }
-                            }
-                            if (connection != null) {
-                                try {
-                                    connection.close();
-                                }
-                                catch (SQLException ex) {
-                                    ex.printStackTrace();
-                                }
-                            }
                         }
-                        finally {
-                            if (statement != null) {
-                                try {
-                                    statement.close();
-                                }
-                                catch (SQLException ex) {
-                                	ex.printStackTrace();
-                                }
-                            }
-                            if (connection != null) {
-                                try {
-                                    connection.close();
-                                }
-                                catch (SQLException ex) {
-                                	ex.printStackTrace();
-                                }
-                            }
+
+                        if (statement != null) {
+                            try { statement.close(); }
+                            catch (SQLException ex) { ex.printStackTrace(); }
+                        }
+                        if (connection != null) {
+                            try { connection.close(); }
+                            catch (SQLException ex) { ex.printStackTrace(); }
                         }
                     }
                 });
+                
+                // Set Fly-Mode
                 if (resultSet.getInt("fly") == 1) {
                     p.setAllowFlight(true);
-                    if (resultSet.getInt("flying") == 1) {
+                    if (resultSet.getInt("flying") == 1)
                         p.setFlying(true);
-                    }
                 }
-                else {
+                else
                     p.setAllowFlight(false);
-                }
+       
+                // Set GameMode
                 try {
-                    final GameMode gm = GameMode.valueOf(resultSet.getString("gamemode"));
-                    if (gm != null) {
+                    GameMode gm = GameMode.valueOf(resultSet.getString("gamemode"));
+                    if (gm != null)
                         p.setGameMode(gm);
-                    }
                 }
-                catch (Exception ex) {}
+                catch (Exception ex) { }
             }
-            else {
+            else
                 p.sendMessage("[CTSuiteBukkit]: Hab dich leider nicht gefunden! Jaa dieser Fall kann auftreten. :(");
-            }
         }
         catch (SQLException e) {
             e.printStackTrace();
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                }
-                catch (SQLException ex) {
-                	ex.printStackTrace();
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                }
-                catch (SQLException ex) {
-                	ex.printStackTrace();
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                }
-                catch (SQLException ex) {
-                	ex.printStackTrace();
-                }
-            }
         }
-        finally {
-            if (resultSet != null) {
-                try {
-                    resultSet.close();
-                }
-                catch (SQLException ex) {
-                	ex.printStackTrace();
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                }
-                catch (SQLException ex) {
-                	ex.printStackTrace();
-                }
-            }
-            if (connection != null) {
-                try {
-                    connection.close();
-                }
-                catch (SQLException ex) {
-                	ex.printStackTrace();
-                }
-            }
+        
+        if (resultSet != null) {
+            try { resultSet.close(); }
+            catch (SQLException ex) { ex.printStackTrace(); }
+        }
+        if (statement != null) {
+            try { statement.close(); }
+            catch (SQLException ex) { ex.printStackTrace(); }
+        }
+        if (connection != null) {
+            try { connection.close(); }
+            catch (SQLException ex) { ex.printStackTrace(); }
         }
     }
     
@@ -233,72 +248,36 @@ public class PlayerHandler implements Listener
                 }
                 catch (SQLException e) {
                     e.printStackTrace();
-                    if (resultSet != null) {
-                        try {
-                            resultSet.close();
-                        }
-                        catch (SQLException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        }
-                        catch (SQLException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                    if (connection != null) {
-                        try {
-                            connection.close();
-                        }
-                        catch (SQLException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
                 }
-                finally {
-                    if (resultSet != null) {
-                        try {
-                            resultSet.close();
-                        }
-                        catch (SQLException e2) {
-                            e2.printStackTrace();
-                        }
-                    }
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        }
-                        catch (SQLException e2) {
-                            e2.printStackTrace();
-                        }
-                    }
-                    if (connection != null) {
-                        try {
-                            connection.close();
-                        }
-                        catch (SQLException e2) {
-                            e2.printStackTrace();
-                        }
-                    }
+
+                if (resultSet != null) {
+                	try { resultSet.close(); }
+                    catch (SQLException ex) { ex.printStackTrace(); }
+                }
+                if (statement != null) {
+                	try { statement.close(); }
+                    catch (SQLException ex) { ex.printStackTrace(); }
+                }
+                if (connection != null) {
+                    try { connection.close(); }
+                    catch (SQLException ex) { ex.printStackTrace(); }
                 }
             }
         });
     }
     
-    public boolean hasPermission(final Player p, final String perm) {
+    public boolean hasPermission(Player p, String perm) {
         return p.isOp() || p.hasPermission(perm);
     }
     
-    public boolean checkPermission(final Player p, final String perm) {
+    public boolean checkPermission(Player p, String perm) {
         if (this.hasPermission(p, perm)) {
             System.out.println("PermissionCheck for player " + p.getName() + " (" + perm + ") -> true");
             return true;
         }
+        
         System.out.println("PermissionCheck for player " + p.getName() + " -> false");
-        final NetworkMessage nm = new NetworkMessage("player.inform.permission.denied");
+        NetworkMessage nm = new NetworkMessage("player.inform.permission.denied");
         nm.put("uuid", p.getUniqueId());
         nm.put("permission", perm);
         nm.send("proxy");

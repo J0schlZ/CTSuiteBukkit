@@ -31,11 +31,12 @@ public class WorldHandler implements Listener
         this.plugin = CTSuite.getInstance();
         this.server = new ArrayList<String>();
         this.worlds = new HashMap<String, String>();
-        for (final World world : Bukkit.getWorlds()) {
+        for (final World world : Bukkit.getWorlds())
             this.worlds.put(world.getName(), Bukkit.getServerName());
-        }
-        final MultiverseCore multiverse = CTSuite.getInstance().getMultiverseCore().getCore();
+        
+        MultiverseCore multiverse = CTSuite.getInstance().getMultiverseCore();
         if (multiverse != null) {
+        	multiverse = multiverse.getCore();
             final Collection<MultiverseWorld> MVWorlds = (Collection<MultiverseWorld>)multiverse.getMVWorldManager().getMVWorlds();
             for (final MultiverseWorld MVWorld : MVWorlds) {
                 if (!this.worlds.containsKey(MVWorld.getName())) {
@@ -51,7 +52,8 @@ public class WorldHandler implements Listener
         if (!this.server.contains(event.getName())) {
             this.server.add(event.getName());
         }
-        final ArrayList<String> worlds = new ArrayList<String>();
+
+        ArrayList<String> worlds = new ArrayList<String>();
         for (final Map.Entry<String, String> entry : this.worlds.entrySet()) {
             if (entry.getValue().equals(Bukkit.getServerName())) {
                 worlds.add(entry.getKey() + ":" + entry.getValue());

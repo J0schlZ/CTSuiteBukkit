@@ -9,32 +9,60 @@
 # update.data.world.list			Bukkit			ALL
 `worlds`		=> (ArrayList<String>)
 
-player.update.joined.server			Bukkit			ALL
+# update.data.players.list			Proxy			Bukkit
+`players`		=> (ArrayList<String>)
+
+# player.update.joined.server		Bukkit			ALL
 `uuid`			=> (UUID),
 `world`			=> (String),
 `prefix`		=> (String),
 `suffix`		=> (String),
 
-player.update.joined.network		Proxy			ALL
+# player.update.joined.network		Proxy			ALL
 `uuid`			=> (UUID),
 
-player.update.leaved.network		Proxy			ALL
+# player.update.leaved.network		Proxy			ALL
 `uuid`			=> (UUID)
 
-player.inform.permission.denied		Bukkit			Proxy
+# player.inform.permission.denied	Bukkit			Proxy
 `targetUUID`	=> (UUID)
 `permission`	=> (String)
 
-player.inform.message.send			Bukkit			Proxy
+# player.inform.message.send		Bukkit			Proxy
 `targetUUID`	=> (UUID)
 `message`		=> (String)
 
-player.cmd.fly						Bukkit			Proxy
+# player.cmd.fly					Bukkit			Proxy
 `targetName`	=> (String)
 `senderUUID`	=> (String)
 `fly`			=> (String)
 `apply`			=> (Boolean)
 
-player.set.fly						Bukkit			Proxy
+# player.set.fly					Proxy			Bukkit
 `targetUUID`	=> (UUID)
 `fly`			=> (Boolean)
+
+# player.update.flying				Proxy			Bukkit
+`targetUUID`	=> (UUID)
+`flying`		=> (Boolean)
+
+# player.cmd.gamemode				Bukkit			Proxy
+`targetName`	=> (String)
+`senderUUID`	=> (String)
+`gamemode`		=> (String)
+`apply`			=> (Boolean)
+
+# player.set.gamemode				Proxy			Bukkit
+`targetUUID`	=> (UUID)
+`gamemode`		=> (String)
+
+# player.update.gamemode			Proxy			Bukkit
+`targetUUID`	=> (UUID)
+`gamemode`		=> (String)
+
+
+
+
+WorldChange broadcasten
+FlyChange "
+GamemodeChange "

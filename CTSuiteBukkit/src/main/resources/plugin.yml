@@ -4,6 +4,8 @@ version: 1.0
 website: http://www.craft-together.de
 author: J0schlZ
 description: An essential plugin for BungeeCord
+depend: [Vault, Multiverse-Core]
+softdepend: [Sockets4MC, Kotlin4MC]
 commands:
    fly:
      description: Toggle Flymode
