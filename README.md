@@ -6,6 +6,7 @@ Bungeecord: https://github.com/J0schlZ/CTSuiteBungee
 All commands are progressed on the Bukkit-side and also usable in command-blocks and it's possible to block them with WorldGuard!
 
 **Planned:**
+ - Gamemode-Management
  - Teleport-Management
  - Respawn-Management
  - Home Management
