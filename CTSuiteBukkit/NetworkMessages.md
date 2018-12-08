@@ -11,12 +11,12 @@ world *(String)*
 ### update.data.world.list
 ###### *Sender: Bukkit | Receiver: All*
 
-world *(ArrayList<String>)*
+world *(ArrayList\<String>)*
 
 ### update.data.players.list
 ###### *Sender: Proxy | Receiver: Bukkit*
 
-players *(ArrayList<String>)*
+players *(ArrayList\<String>)*
 
 ### player.update.joined.server
 ###### *Sender: Bukkit | Receiver: All*
