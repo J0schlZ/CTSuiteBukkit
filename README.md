@@ -21,7 +21,7 @@ Command | Parameters
 /gamemode | *<gamemode> [player]*
 /tp | *[player]*
 /tphere | *[player]*
-/tppos | *<x> <y> <z> [world] [server] [pitch] [yaw]*
+/tppos | *<x> <y> <z> [world] [server] [yaw] [pitch]*
 
 **Permissions:**
  - ctsuite.command.fly

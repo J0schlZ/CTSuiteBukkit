@@ -16,6 +16,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 import de.crafttogether.ctsuite.bukkit.commands.FlyCommand;
 import de.crafttogether.ctsuite.bukkit.commands.GamemodeCommand;
+import de.crafttogether.ctsuite.bukkit.commands.teleport.TPPosCommand;
 import de.crafttogether.ctsuite.bukkit.events.PlayerListener;
 import de.crafttogether.ctsuite.bukkit.events.WorldListener;
 import de.crafttogether.ctsuite.bukkit.handlers.PlayerHandler;
@@ -72,6 +73,14 @@ public class CTSuite extends JavaPlugin
         
         this.registerCommand("fly", new FlyCommand());
         this.registerCommand("gamemode", new GamemodeCommand());
+
+        this.registerCommand("tppos", new TPPosCommand());
+        //this.registerCommand("tp", new TPCommand());
+        //this.registerCommand("tphere", new TPHereCommand());
+        //this.registerCommand("tpa", new TPACommand());
+        //this.registerCommand("tpahere", new TPAHereCommand());
+        //this.registerCommand("tpaccept", new TPAcceptCommand());
+        //this.registerCommand("tpdeny", new TPDenyCommand());
         
         this.playerHandler.readPlayersFromDB();
     }

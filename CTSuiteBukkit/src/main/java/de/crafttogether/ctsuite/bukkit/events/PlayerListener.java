@@ -1,5 +1,8 @@
 package de.crafttogether.ctsuite.bukkit.events;
 
+import java.util.HashMap;
+
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,28 +26,40 @@ public class PlayerListener implements Listener
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(final PlayerJoinEvent ev) {
-        Player p = ev.getPlayer();
-        Chat chat = this.plugin.getChat();
-        String prefix = null;
-        String suffix = null;
-        
-        if (chat != null) {
-            try {
-                prefix = this.plugin.getChat().getPlayerPrefix(p);
-                prefix = ((prefix != null) ? prefix : "");
-                suffix = this.plugin.getChat().getPlayerSuffix(p);
-                suffix = ((suffix != null) ? suffix : "");
-            }
-            catch (Exception ex) {}
-        }
-        
-        this.plugin.getPlayerHandler().registerLogin(ev.getPlayer());
-        NetworkMessage nMessage = new NetworkMessage("player.update.joined.server");
-        nMessage.put("uuid", p.getUniqueId());
-        nMessage.put("prefix", prefix);
-        nMessage.put("suffix", suffix);
-        nMessage.put("world", p.getWorld().getName());
-        nMessage.send("all");
+    	Player p = ev.getPlayer();
+    	
+		if (plugin.getPlayerHandler().pendingTeleports.containsKey(p.getUniqueId())) {
+			HashMap<String, Object> pendingTeleport = plugin.getPlayerHandler().pendingTeleports.get(p.getUniqueId());
+			Location loc = (Location) pendingTeleport.get("location");
+			
+			plugin.getPlayerHandler().pendingTeleports.remove(p.getUniqueId());
+			p.teleport(loc);
+			
+			System.out.println("PendingTeleport for " + p.getName() + " (" + (System.currentTimeMillis() / 1000L - (int) pendingTeleport.get("timestamp")) + ")");
+		}
+		
+		this.plugin.getPlayerHandler().registerLogin(ev.getPlayer());
+		
+		Chat chat = this.plugin.getChat();
+		String prefix = null;
+		String suffix = null;
+		
+		if (chat != null) {
+		    try {
+		        prefix = this.plugin.getChat().getPlayerPrefix(p);
+		        prefix = ((prefix != null) ? prefix : "");
+		    suffix = this.plugin.getChat().getPlayerSuffix(p);
+		    suffix = ((suffix != null) ? suffix : "");
+		    }
+		    catch (Exception ex) {}
+		}
+		
+		NetworkMessage nMessage = new NetworkMessage("player.update.joined.server");
+		nMessage.put("uuid", p.getUniqueId());
+		nMessage.put("prefix", prefix);
+		nMessage.put("suffix", suffix);
+		nMessage.put("world", p.getWorld().getName());
+		nMessage.send("all");
     }
     
     @EventHandler

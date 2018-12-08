@@ -10,6 +10,8 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,12 +25,14 @@ public class PlayerHandler implements Listener
 {
     private CTSuite plugin;
     public HashMap<UUID, String> uuids; // uuid, name
-    public HashMap<UUID, HashMap<String, Object>> onlinePlayers; // uuid, server
+    public HashMap<UUID, HashMap<String, Object>> onlinePlayers;
+    public HashMap<UUID, HashMap<String, Object>> pendingTeleports;
     
     public PlayerHandler() {
         this.plugin = CTSuite.getInstance();
         this.uuids = new HashMap<UUID, String>();
         this.onlinePlayers = new HashMap<UUID, HashMap<String, Object>>();
+        this.pendingTeleports = new HashMap<UUID, HashMap<String, Object>>();
         Bukkit.getPluginManager().registerEvents(this, this.plugin);
     }
 
@@ -77,15 +81,28 @@ public class PlayerHandler implements Listener
                 	(Boolean) ev.getValue("fly")
                 );
                 break;
-            
+                
             case "player.set.gamemode": 
                 this.setGamemode(
                 	UUID.fromString((String) ev.getValue("uuid")),
                 	(String) ev.getValue("gamemode")
                 );
                 break;
+                    
+            case "player.set.tppos": 
+                this.onPlayerTPPos(
+					UUID.fromString((String) ev.getValue("uuid")),
+					(Double) ev.getValue("x"),
+					(Double) ev.getValue("y"),
+					(Double) ev.getValue("z"),
+					(String) ev.getValue("world"),
+					Float.parseFloat((String) ev.getValue("yaw")),
+					Float.parseFloat((String) ev.getValue("pitch"))
+                );
+                break;
         }
     }
+
 	private void onPlayerList(ArrayList<String> playerList) {
     	// 'uuid:name:server:world'
 		this.onlinePlayers = new HashMap<UUID, HashMap<String, Object>>();
@@ -155,6 +172,34 @@ public class PlayerHandler implements Listener
         if (p != null && gm != null)
             p.setGameMode(gm);
 	}
+    
+	private void onPlayerTPPos(UUID uuid, Double x, Double y, Double z, String worldName, float yaw, float pitch) {
+		Player p = Bukkit.getServer().getPlayer(uuid);
+		World world = Bukkit.getWorld(worldName);
+
+		if (world == null)
+			return;
+		
+		Location loc = new Location(world, x, y, z, yaw, pitch);
+		
+		if (world != null && p != null && p.isOnline())
+			p.teleport(loc);
+		else
+			storeTeleport(uuid, loc);
+	}
+	
+	public void storeTeleport(UUID uuid, Location loc) {
+		if (!this.uuids.containsKey(uuid))
+			return;
+		
+		HashMap<String, Object> pendingTeleport = new HashMap<String, Object>();
+		pendingTeleport.put("uuid", uuid);
+		pendingTeleport.put("timestamp", (int) (System.currentTimeMillis() / 1000L));
+		pendingTeleport.put("location", loc);
+		
+		this.pendingTeleports.put(uuid, pendingTeleport);
+	}
+    
     public void registerLogin(Player p) {
         ResultSet resultSet = null;
         PreparedStatement statement = null;
