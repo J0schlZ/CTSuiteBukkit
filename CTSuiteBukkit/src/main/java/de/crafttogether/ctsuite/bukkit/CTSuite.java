@@ -4,11 +4,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -18,7 +15,8 @@ import com.onarandombox.MultiverseCore.MultiverseCore;
 import com.zaxxer.hikari.HikariDataSource;
 
 import de.crafttogether.ctsuite.bukkit.commands.FlyCommand;
-import de.crafttogether.ctsuite.bukkit.events.PlayerJoinListener;
+import de.crafttogether.ctsuite.bukkit.commands.GamemodeCommand;
+import de.crafttogether.ctsuite.bukkit.events.PlayerListener;
 import de.crafttogether.ctsuite.bukkit.events.WorldListener;
 import de.crafttogether.ctsuite.bukkit.handlers.PlayerHandler;
 import de.crafttogether.ctsuite.bukkit.handlers.WorldHandler;
@@ -40,14 +38,19 @@ public class CTSuite extends JavaPlugin
     private WorldHandler worldHandler;
     
     public void onEnable() {
-        (CTSuite.plugin = this).saveDefaultConfig();
-        this.config = (Configuration)this.getConfig();
-        (this.hikari = new HikariDataSource()).setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
+        CTSuite.plugin = this;
+        		
+        this.saveDefaultConfig();
+        this.config = this.getConfig();
+        
+        this.hikari = new HikariDataSource();
+        this.hikari.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
         this.hikari.addDataSourceProperty("serverName", this.config.get("MySQL.host"));
         this.hikari.addDataSourceProperty("port", this.config.get("MySQL.port"));
         this.hikari.addDataSourceProperty("databaseName", this.config.get("MySQL.database"));
         this.hikari.addDataSourceProperty("user", this.config.get("MySQL.user"));
         this.hikari.addDataSourceProperty("password", this.config.get("MySQL.password"));
+        
         this.messagingService = "Sockets4MC";
         this.tablePrefix = this.config.getString("MySQL.prefix");
         
@@ -64,10 +67,12 @@ public class CTSuite extends JavaPlugin
         this.playerHandler = new PlayerHandler();
         this.worldHandler = new WorldHandler();
         
-        Bukkit.getPluginManager().registerEvents((Listener)new PlayerJoinListener(), (Plugin)this);
-        Bukkit.getPluginManager().registerEvents((Listener)new WorldListener(), (Plugin)this);
+        Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
+        Bukkit.getPluginManager().registerEvents(new WorldListener(), this);
         
-        this.registerCommand("fly", (TabExecutor)new FlyCommand());
+        this.registerCommand("fly", new FlyCommand());
+        this.registerCommand("gamemode", new GamemodeCommand());
+        
         this.playerHandler.readPlayersFromDB();
     }
     
@@ -81,8 +86,8 @@ public class CTSuite extends JavaPlugin
     }
     
     public void registerCommand(final String cmd, final TabExecutor executor) {
-        this.getCommand(cmd).setExecutor((CommandExecutor)executor);
-        this.getCommand(cmd).setTabCompleter((TabCompleter)executor);
+        this.getCommand(cmd).setExecutor(executor);
+        this.getCommand(cmd).setTabCompleter(executor);
     }
     
     private void loadPlugins() {
@@ -93,7 +98,7 @@ public class CTSuite extends JavaPlugin
         if (this.vaultLoaded) {
         	RegisteredServiceProvider<Chat> chatProvider = getServer().getServicesManager().getRegistration(Chat.class);
             if (chatProvider != null) {
-                this.chat = (Chat)chatProvider.getProvider();
+                this.chat = chatProvider.getProvider();
             }
         }
         else
@@ -103,7 +108,7 @@ public class CTSuite extends JavaPlugin
         if (this.MVLoaded) {
             plugin = pm.getPlugin("Multiverse-Core");
             if (plugin instanceof MultiverseCore)
-                this.multiverse = (MultiverseCore)plugin;
+                this.multiverse = (MultiverseCore) plugin;
             else
                 this.getLogger().warning("Couln't find Multiverse-Core.");
         }

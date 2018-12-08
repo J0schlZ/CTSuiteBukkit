@@ -19,22 +19,22 @@ public class WorldListener implements Listener
     
     @EventHandler
     public void onWorldLoad(final WorldLoadEvent ev) {
-        final String worldName = ev.getWorld().getName();
+        String worldName = ev.getWorld().getName();
         if (this.plugin.getWorldHandler().worlds.containsKey(worldName)) {
             this.plugin.getWorldHandler().worlds.put(worldName, Bukkit.getServerName());
         }
-        final NetworkMessage nm = new NetworkMessage("data.update.world.loaded");
+        NetworkMessage nm = new NetworkMessage("data.update.world.loaded");
         nm.put("world", worldName);
         nm.send("all");
     }
     
     @EventHandler
     public void onWorldUnload(final WorldUnloadEvent ev) {
-        final String worldName = ev.getWorld().getName();
+        String worldName = ev.getWorld().getName();
         if (this.plugin.getWorldHandler().worlds.containsKey(worldName)) {
             this.plugin.getWorldHandler().worlds.remove(worldName);
         }
-        final NetworkMessage nm = new NetworkMessage("data.update.world.unloaded");
+        NetworkMessage nm = new NetworkMessage("data.update.world.unloaded");
         nm.put("world", worldName);
         nm.send("all");
     }
