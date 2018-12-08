@@ -15,6 +15,7 @@ import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import de.crafttogether.ctsuite.bukkit.CTSuite;
 import de.crafttogether.ctsuite.bukkit.messaging.NetworkMessage;
+import de.crafttogether.ctsuite.bukkit.util.CTLocation;
 
 public class TPPosCommand implements TabExecutor {
     private CTSuite plugin;
@@ -88,24 +89,13 @@ public class TPPosCommand implements TabExecutor {
         world = Bukkit.getWorld(worldName);
         Location loc = new Location(world, x, y, z, yaw, pitch);
         
-        System.out.println(loc);
-        System.out.println("isOnline: " + p.isOnline());
-        System.out.println("p.getServer: " + Bukkit.getServerName());
-        System.out.println("serverName: " + serverName);
-        
-        // Location is on same Server
         if (world != null && p.isOnline() && Bukkit.getServerName().equalsIgnoreCase(serverName))
     		p.teleport(loc);
         else {
-        	NetworkMessage nm = new NetworkMessage("player.cmd.tppos");
+        	CTLocation ctLoc = new CTLocation(loc, serverName);
+        	NetworkMessage nm = new NetworkMessage("player.teleport.location");
         	nm.put("uuid", p.getUniqueId());
-        	nm.put("x", x);
-        	nm.put("y", y);
-        	nm.put("z", z);
-        	nm.put("world", worldName);
-        	nm.put("server", serverName);
-        	nm.put("yaw", "" + yaw);
-        	nm.put("pitch", "" + pitch);
+        	nm.put("location", ctLoc.toString());
         	nm.send("proxy");
         }
         

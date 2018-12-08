@@ -20,6 +20,7 @@ import org.bukkit.plugin.Plugin;
 import de.crafttogether.ctsuite.bukkit.CTSuite;
 import de.crafttogether.ctsuite.bukkit.messaging.NetworkMessage;
 import de.crafttogether.ctsuite.bukkit.messaging.NetworkMessageEvent;
+import de.crafttogether.ctsuite.bukkit.util.CTLocation;
 
 public class PlayerHandler implements Listener
 {
@@ -92,12 +93,7 @@ public class PlayerHandler implements Listener
             case "player.set.tppos": 
                 this.onPlayerTPPos(
 					UUID.fromString((String) ev.getValue("uuid")),
-					(Double) ev.getValue("x"),
-					(Double) ev.getValue("y"),
-					(Double) ev.getValue("z"),
-					(String) ev.getValue("world"),
-					Float.parseFloat((String) ev.getValue("yaw")),
-					Float.parseFloat((String) ev.getValue("pitch"))
+					CTLocation.fromString((String) ev.getValue("location"))
                 );
                 break;
         }
@@ -173,16 +169,14 @@ public class PlayerHandler implements Listener
             p.setGameMode(gm);
 	}
     
-	private void onPlayerTPPos(UUID uuid, Double x, Double y, Double z, String worldName, float yaw, float pitch) {
+	private void onPlayerTPPos(UUID uuid, CTLocation ctLoc) {
 		Player p = Bukkit.getServer().getPlayer(uuid);
-		World world = Bukkit.getWorld(worldName);
-
-		if (world == null)
+		Location loc = ctLoc.getLocation();
+		
+		if (loc == null)
 			return;
 		
-		Location loc = new Location(world, x, y, z, yaw, pitch);
-		
-		if (world != null && p != null && p.isOnline())
+		if (p != null && p.isOnline())
 			p.teleport(loc);
 		else
 			storeTeleport(uuid, loc);
@@ -277,15 +271,15 @@ public class PlayerHandler implements Listener
     }
     
     public void readPlayersFromDB() {
-        Bukkit.getScheduler().runTaskAsynchronously((Plugin)this.plugin, (Runnable)new Runnable() {
+        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable() {
             @Override
             public void run() {
                 ResultSet resultSet = null;
                 PreparedStatement statement = null;
                 Connection connection = null;
                 try {
-                    connection = PlayerHandler.this.plugin.getMySQLConnection();
-                    statement = connection.prepareStatement("SELECT `uuid`,`name` FROM " + PlayerHandler.this.plugin.getTablePrefix() + "players");
+                    connection = plugin.getMySQLConnection();
+                    statement = connection.prepareStatement("SELECT `uuid`,`name` FROM " + plugin.getTablePrefix() + "players");
                     resultSet = statement.executeQuery();
                     while (resultSet.next()) {
                         PlayerHandler.this.uuids.put(UUID.fromString(resultSet.getString("uuid")), resultSet.getString("name"));

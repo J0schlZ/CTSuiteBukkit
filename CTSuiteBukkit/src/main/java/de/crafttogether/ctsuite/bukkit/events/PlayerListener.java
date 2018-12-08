@@ -2,6 +2,7 @@ package de.crafttogether.ctsuite.bukkit.events;
 
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,10 +11,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 
 import de.crafttogether.ctsuite.bukkit.CTSuite;
 import de.crafttogether.ctsuite.bukkit.messaging.NetworkMessage;
+import de.crafttogether.ctsuite.bukkit.util.CTLocation;
 import net.milkbowl.vault.chat.Chat;
 
 public class PlayerListener implements Listener
@@ -60,6 +64,24 @@ public class PlayerListener implements Listener
 		nMessage.put("suffix", suffix);
 		nMessage.put("world", p.getWorld().getName());
 		nMessage.send("all");
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent ev) {
+		NetworkMessage nMessage = new NetworkMessage("player.update.leaved.server");
+        nMessage.put("uuid", ev.getPlayer().getUniqueId());
+        nMessage.put("location", new CTLocation(ev.getPlayer().getLocation(), Bukkit.getServerName()).toString());
+        nMessage.send("proxy");
+    }
+
+    @EventHandler
+    public void onPlayerKick(PlayerKickEvent ev) {
+		NetworkMessage nMessage = new NetworkMessage("player.update.kicked.server");
+        nMessage.put("uuid", ev.getPlayer().getUniqueId());
+        nMessage.put("location", new CTLocation(ev.getPlayer().getLocation(), Bukkit.getServerName()).toString());
+        nMessage.put("reason", ev.getReason());
+        nMessage.put("message", ev.getLeaveMessage());
+        nMessage.send("proxy");
     }
     
     @EventHandler
