@@ -20,8 +20,8 @@ Command | Parameters
 ------------ | -------------
 /fly | *[on/off/player] [on/off]*
 /gamemode | *<gamemode> [player]*
-/tp | *[player]*
-/tphere | *[player]*
+/tp | *\<player> [player]*
+/tphere | *<player>*
 /tppos | *\<x> \<y> \<z> [world] [server] [pitch] [yaw]*
 
 **Permissions:**
