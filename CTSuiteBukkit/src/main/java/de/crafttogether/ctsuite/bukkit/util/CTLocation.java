@@ -36,6 +36,16 @@ public class CTLocation {
 		this.server = server;
 	}
 	
+	public CTLocation(Location loc, String world, String server) {
+		this.x = loc.getX();
+		this.y = loc.getY();
+		this.z = loc.getZ();
+		this.world = world;
+		this.yaw = loc.getYaw();
+		this.pitch = loc.getPitch();
+		this.server = server;
+	}
+	
 	public CTLocation(Double x, Double y, Double z, String world, String server, float yaw, float pitch) {
 		this.x = x;
 		this.y = y;

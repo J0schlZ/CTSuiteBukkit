@@ -92,7 +92,7 @@ public class TPPosCommand implements TabExecutor {
         if (world != null && p.isOnline() && Bukkit.getServerName().equalsIgnoreCase(serverName))
     		p.teleport(loc);
         else {
-        	CTLocation ctLoc = new CTLocation(loc, serverName);
+        	CTLocation ctLoc = new CTLocation(loc, worldName, serverName);
         	NetworkMessage nm = new NetworkMessage("player.teleport.location");
         	nm.put("uuid", p.getUniqueId());
         	nm.put("location", ctLoc.toString());

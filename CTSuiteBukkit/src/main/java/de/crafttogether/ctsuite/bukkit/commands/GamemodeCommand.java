@@ -77,10 +77,10 @@ public class GamemodeCommand implements TabExecutor
                 return true;
             }
             
-            if (!this.plugin.getPlayerHandler().checkPermission(p, "ctsuite.command.gamemode"))
+            if (!this.plugin.getPlayerHandler().checkPermission(sender, "ctsuite.command.gamemode"))
                 return true;
             
-            if (!this.plugin.getPlayerHandler().checkPermission(p, "ctsuite.command.gamemode." + gameMode.toString()))
+            if (!this.plugin.getPlayerHandler().checkPermission(sender, "ctsuite.command.gamemode." + gameMode.toString()))
                 return true;
             
             p.setGameMode(gameMode);
@@ -100,9 +100,9 @@ public class GamemodeCommand implements TabExecutor
             
             if (p != null) {
                 senderUUID = p.getUniqueId().toString();
-                if (!this.plugin.getPlayerHandler().checkPermission(p, "ctsuite.command.gamemode.others"))
+                if (!this.plugin.getPlayerHandler().checkPermission(sender, "ctsuite.command.gamemode.others"))
                     return true;
-                if (!this.plugin.getPlayerHandler().checkPermission(p, "ctsuite.command.gamemode.others." + gameMode.toString()))
+                if (!this.plugin.getPlayerHandler().checkPermission(sender, "ctsuite.command.gamemode.others." + gameMode.toString()))
                     return true;
             }
             
@@ -137,23 +137,23 @@ public class GamemodeCommand implements TabExecutor
             if (sender instanceof Player)
                 p = (Player)sender;
             
-            if (p == null || this.plugin.getPlayerHandler().hasPermission(p, "ctsuite.command.gamemode"))
+            if (p == null || this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode"))
                 hasPermGm = true;
             
-            if (p == null || this.plugin.getPlayerHandler().hasPermission(p, "ctsuite.command.gamemode.others"))
+            if (p == null || this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others"))
                 hasPermGmOthers = true;
             
             if (args.length == 1 && hasPermGm) {
-                if (this.plugin.getPlayerHandler().hasPermission(p, "ctsuite.command.gamemode.survival") || this.plugin.getPlayerHandler().hasPermission(p, "ctsuite.command.gamemode.others.spectator"))
+                if (this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.survival") || this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others.spectator"))
                 	proposals.add("survival");
                 
-                if (this.plugin.getPlayerHandler().hasPermission(p, "ctsuite.command.gamemode.creative") || this.plugin.getPlayerHandler().hasPermission(p, "ctsuite.command.gamemode.others.spectator"))
+                if (this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.creative") || this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others.spectator"))
                     proposals.add("creative");
                 
-                if (this.plugin.getPlayerHandler().hasPermission(p, "ctsuite.command.gamemode.adventure") || this.plugin.getPlayerHandler().hasPermission(p, "ctsuite.command.gamemode.others.spectator"))
+                if (this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.adventure") || this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others.spectator"))
                     proposals.add("adventure");
                 
-                if (this.plugin.getPlayerHandler().hasPermission(p, "ctsuite.command.gamemode.spectator") || this.plugin.getPlayerHandler().hasPermission(p, "ctsuite.command.gamemode.others.spectator"))
+                if (this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.spectator") || this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others.spectator"))
                     proposals.add("spectator");
                 
             }

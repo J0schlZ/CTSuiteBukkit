@@ -1,3 +1,4 @@
+
 package de.crafttogether.ctsuite.bukkit.commands;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class FlyCommand implements TabExecutor
                 this.plugin.getLogger().log(Level.INFO, "[CTSuite]: This command can't performed by Console");
                 return true;
             }
-            if (!this.plugin.getPlayerHandler().checkPermission(p, "ctsuite.command.fly")) {
+            if (!this.plugin.getPlayerHandler().checkPermission(sender, "ctsuite.command.fly")) {
                 return true;
             }
             
@@ -83,7 +84,7 @@ public class FlyCommand implements TabExecutor
             
             if (p != null) {
                 senderUUID = p.getUniqueId().toString();
-                if (!this.plugin.getPlayerHandler().checkPermission(p, "ctsuite.command.fly.others")) {
+                if (!this.plugin.getPlayerHandler().checkPermission(sender, "ctsuite.command.fly.others")) {
                     return true;
                 }
             }
@@ -159,10 +160,10 @@ public class FlyCommand implements TabExecutor
             if (sender instanceof Player)
                 p = (Player)sender;
             
-            if (p == null || plugin.getPlayerHandler().hasPermission(p, "ctsuite.command.fly"))
+            if (p == null || plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.fly"))
                 hasPermFly = true;
             
-            if (p == null || plugin.getPlayerHandler().hasPermission(p, "ctsuite.command.fly.others"))
+            if (p == null || plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.fly.others"))
                 hasPermFlyOthers = true;
             
             if (args.length == 1 && hasPermFly) {

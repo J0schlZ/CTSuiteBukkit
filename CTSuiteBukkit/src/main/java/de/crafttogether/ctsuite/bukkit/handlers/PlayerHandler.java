@@ -9,9 +9,11 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -47,6 +49,14 @@ public class PlayerHandler implements Listener
         			(ArrayList<String>) ev.getValue("players")
         		);
         	break;
+     
+            case "player.request.location":
+                this.onLocationRequest(
+                	UUID.fromString((String) ev.getValue("uuid")),
+                	(String) ev.getValue("requestId"),
+                	ev.getSender()
+                );
+                break;
      
             case "player.update.joined.server":
                 this.onPlayerJoinedServer(
@@ -89,15 +99,36 @@ public class PlayerHandler implements Listener
                 	(String) ev.getValue("gamemode")
                 );
                 break;
-                    
-            case "player.set.tppos": 
-                this.onPlayerTPPos(
-					UUID.fromString((String) ev.getValue("uuid")),
-					CTLocation.fromString((String) ev.getValue("location"))
-                );
-                break;
+                
+        case "player.teleport.location": 
+            this.onPlayerTeleportLocation(
+				UUID.fromString((String) ev.getValue("uuid")),
+				CTLocation.fromString((String) ev.getValue("location"))
+            );
+            break;
+		        
+		case "player.teleport.player": 
+		    this.onPlayerTeleportPlayer(
+				UUID.fromString((String) ev.getValue("playerUUID")),
+				UUID.fromString((String) ev.getValue("targetUUID"))
+		    );
+		    break;
         }
     }
+
+	private void onLocationRequest(UUID uuid, String requestId, String sender) {
+		Player p = Bukkit.getPlayer(uuid);
+		
+		if (p == null)
+			return;
+		
+		CTLocation loc = new CTLocation(p.getLocation(), Bukkit.getServerName());
+		NetworkMessage nm = new NetworkMessage("player.response.location");
+		
+		nm.put("location", loc.toString());
+		nm.put("requestId", requestId);
+    	nm.send(sender);
+	}
 
 	private void onPlayerList(ArrayList<String> playerList) {
     	// 'uuid:name:server:world'
@@ -169,7 +200,7 @@ public class PlayerHandler implements Listener
             p.setGameMode(gm);
 	}
     
-	private void onPlayerTPPos(UUID uuid, CTLocation ctLoc) {
+	private void onPlayerTeleportLocation(UUID uuid, CTLocation ctLoc) {
 		Player p = Bukkit.getServer().getPlayer(uuid);
 		Location loc = ctLoc.getLocation();
 		
@@ -182,16 +213,41 @@ public class PlayerHandler implements Listener
 			storeTeleport(uuid, loc);
 	}
 	
+	private void onPlayerTeleportPlayer(UUID playerUUID, UUID targetUUID) {
+		Player player = Bukkit.getServer().getPlayer(playerUUID);
+		Player target = Bukkit.getServer().getPlayer(targetUUID);
+		
+		if (target == null || !target.isOnline())
+			return;
+		
+		if (player != null && player.isOnline())
+			player.teleport(target);
+		else
+			storeTeleport(playerUUID, targetUUID);
+	}
+	
 	public void storeTeleport(UUID uuid, Location loc) {
 		if (!this.uuids.containsKey(uuid))
 			return;
 		
 		HashMap<String, Object> pendingTeleport = new HashMap<String, Object>();
 		pendingTeleport.put("uuid", uuid);
-		pendingTeleport.put("timestamp", (int) (System.currentTimeMillis() / 1000L));
 		pendingTeleport.put("location", loc);
+		pendingTeleport.put("timestamp", (int) (System.currentTimeMillis() / 1000L));
 		
 		this.pendingTeleports.put(uuid, pendingTeleport);
+	}
+	
+	public void storeTeleport(UUID playerUUID, UUID targetUUID) {
+		if (!this.uuids.containsKey(playerUUID))
+			return;
+		
+		HashMap<String, Object> pendingTeleport = new HashMap<String, Object>();
+		pendingTeleport.put("playerUUID", playerUUID);
+		pendingTeleport.put("targetUUID", targetUUID);
+		pendingTeleport.put("timestamp", (int) (System.currentTimeMillis() / 1000L));
+		
+		this.pendingTeleports.put(playerUUID, pendingTeleport);
 	}
     
     public void registerLogin(Player p) {
@@ -232,6 +288,19 @@ public class PlayerHandler implements Listener
                     }
                 });
                 
+                String strLoginLocation = resultSet.getString("login_location");
+                if (strLoginLocation != null) {
+                	CTLocation loginLocation = CTLocation.fromString(strLoginLocation);
+                	
+                	if (!loginLocation.getServer().equalsIgnoreCase(Bukkit.getServer().getName()))
+                		return;
+
+                	p.teleport(loginLocation.getLocation());
+                }
+                else {
+                	// spawn handling.. firstspawn etc
+                }
+                
                 // Set Fly-Mode
                 if (resultSet.getInt("fly") == 1) {
                     p.setAllowFlight(true);
@@ -250,7 +319,7 @@ public class PlayerHandler implements Listener
                 catch (Exception ex) { }
             }
             else
-                p.sendMessage("[CTSuiteBukkit]: Hab dich leider nicht gefunden! Jaa dieser Fall kann auftreten. :(");
+                p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&4[CTSuiteBukkit]: &cError: player not found in database"));
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -307,6 +376,17 @@ public class PlayerHandler implements Listener
     
     public boolean hasPermission(Player p, String perm) {
         return p.isOp() || p.hasPermission(perm);
+    }
+    
+    public boolean hasPermission(CommandSender sender, String perm) {
+        return sender.isOp() || sender.hasPermission(perm);
+    }
+    
+    public boolean checkPermission(CommandSender sender, String perm) {
+    	if (sender instanceof Player)
+    		return checkPermission((Player) sender, perm);
+    	else
+    		return hasPermission(sender, perm);
     }
     
     public boolean checkPermission(Player p, String perm) {

@@ -30,19 +30,26 @@ public class PlayerListener implements Listener
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(final PlayerJoinEvent ev) {
-    	Player p = ev.getPlayer();
-    	
+    	Player p = ev.getPlayer();		
+		this.plugin.getPlayerHandler().registerLogin(ev.getPlayer());
+		
 		if (plugin.getPlayerHandler().pendingTeleports.containsKey(p.getUniqueId())) {
 			HashMap<String, Object> pendingTeleport = plugin.getPlayerHandler().pendingTeleports.get(p.getUniqueId());
-			Location loc = (Location) pendingTeleport.get("location");
 			
-			plugin.getPlayerHandler().pendingTeleports.remove(p.getUniqueId());
-			p.teleport(loc);
+			if (pendingTeleport.containsKey("location")) {
+				Location loc = (Location) pendingTeleport.get("location");
+				plugin.getPlayerHandler().pendingTeleports.remove(p.getUniqueId());
+				p.teleport(loc);
+			}
+			
+			if (pendingTeleport.containsKey("targetUUID")) {
+				Location loc = (Location) pendingTeleport.get("targetUUID");
+				plugin.getPlayerHandler().pendingTeleports.remove(p.getUniqueId());
+				p.teleport(loc);
+			}
 			
 			System.out.println("PendingTeleport for " + p.getName() + " (" + (System.currentTimeMillis() / 1000L - (int) pendingTeleport.get("timestamp")) + ")");
 		}
-		
-		this.plugin.getPlayerHandler().registerLogin(ev.getPlayer());
 		
 		Chat chat = this.plugin.getChat();
 		String prefix = null;

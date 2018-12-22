@@ -60,62 +60,68 @@ public class Sockets4MC {
     }
 
     @SuppressWarnings("unchecked")
-	public void send(String messageKey, String serverName, HashMap<String, Object> values) {		
-        MultiSocket socket = null;
-        
-        socket = getSocket("default");
-       
-        if(socket == null) {
-        	System.out.println("Socket #default is not available");
-        	return;
-        }
-        
-        Map<String, Connection> peers = socket.getPeers();
-    	
-    	if (serverName.equalsIgnoreCase("all")) {
-    		peers = socket.getPeers();
+	public void send(String messageKey, String serverName, HashMap<String, Object> values) {
+    	System.out.println("Send: " + messageKey);
+    	Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
+    		@Override
+    		public void run() {
+    	        MultiSocket socket = null;
+    	        
+    	        socket = getSocket("default");
+    	       
+    	        if(socket == null) {
+    	        	System.out.println("Socket #default is not available");
+    	        	return;
+    	        }
+    	        
+    	        Map<String, Connection> peers = socket.getPeers();
+    	    	
+    	    	if (serverName.equalsIgnoreCase("all")) {
+    	    		peers = socket.getPeers();
 
-			for (Entry<String, Connection> entry : peers.entrySet()) {
-				Connection conn = entry.getValue();
-				send(messageKey, conn.getTargetName(), values);
-			}
-			return;
-		}
-		
-		if (serverName.equalsIgnoreCase("servers")) {
-    		peers = socket.getPeers();
+    				for (Entry<String, Connection> entry : peers.entrySet()) {
+    					Connection conn = entry.getValue();
+    					send(messageKey, conn.getTargetName(), values);
+    				}
+    				return;
+    			}
+    			
+    			if (serverName.equalsIgnoreCase("servers")) {
+    	    		peers = socket.getPeers();
 
-			for (Entry<String, Connection> entry : peers.entrySet()) {
-				Connection conn = entry.getValue();
-				if (conn.getTargetName().equalsIgnoreCase("proxy")) continue;
-				send(messageKey, conn.getTargetName(), values);
-			}
-			return;
-		}
-		
-		if (serverName.contains(",")) {
-			String[] servers = serverName.split(",");
-			for (String server : servers)
-				send(messageKey, server, values);
-			return;
-		}
+    				for (Entry<String, Connection> entry : peers.entrySet()) {
+    					Connection conn = entry.getValue();
+    					if (conn.getTargetName().equalsIgnoreCase("proxy")) continue;
+    					send(messageKey, conn.getTargetName(), values);
+    				}
+    				return;
+    			}
+    			
+    			if (serverName.contains(",")) {
+    				String[] servers = serverName.split(",");
+    				for (String server : servers)
+    					send(messageKey, server, values);
+    				return;
+    			}
 
-        Connection connection = socket.getConnection(serverName);
-        
-        if(connection == null) {
-        	System.out.println("Connection to "+serverName+" is not available");
-        	return;
-        }
+    	        Connection connection = socket.getConnection(serverName);
+    	        
+    	        if(connection == null) {
+    	        	System.out.println("Connection to "+serverName+" is not available");
+    	        	return;
+    	        }
 
-        JSONObject jsonObj = new JSONObject();
+    	        JSONObject jsonObj = new JSONObject();
 
-    	jsonObj.put("messageKey", messageKey);
-        for (Entry<String, Object> entry : values.entrySet())
-        	jsonObj.put(entry.getKey(), entry.getValue());
-        	
-        connection.msg("ctsuite", jsonObj);
-        
-        CTSuite.getInstance().getLogger().info("[NMessage] (" + Bukkit.getServerName() + " -> " + serverName + "): " + messageKey);
+    	    	jsonObj.put("messageKey", messageKey);
+    	        for (Entry<String, Object> entry : values.entrySet())
+    	        	jsonObj.put(entry.getKey(), entry.getValue());
+    	        	
+    	        connection.msg("ctsuite", jsonObj);
+    	        
+    	        CTSuite.getInstance().getLogger().info("[NMessage] (" + Bukkit.getServerName() + " -> " + serverName + "): " + messageKey);
+    		}
+    	});
     }
     
     public static Sockets4MC getInstance() {
