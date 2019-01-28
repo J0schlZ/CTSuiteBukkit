@@ -114,7 +114,7 @@ public class CTSuite extends JavaPlugin
         else
             this.getLogger().warning("Couln't find Vault.");
         
-        this.MVLoaded = (pm.getPlugin("Vault") != null);
+        this.MVLoaded = (pm.getPlugin("Multiverse-Core") != null);
         if (this.MVLoaded) {
             plugin = pm.getPlugin("Multiverse-Core");
             if (plugin instanceof MultiverseCore)

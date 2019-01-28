@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -99,4 +100,20 @@ public class WorldHandler implements Listener
             }
         }
     }
+	
+	public String findServer(String serverName) {
+		for (String server : this.server) {
+			if (server.equalsIgnoreCase(serverName))
+				return server;
+		}
+		return null;
+	}
+
+	public String findWorld(String worldName) {
+		for (Entry<String, String> entry : this.worlds.entrySet()) {
+			if (entry.getKey().equalsIgnoreCase(worldName))
+				return entry.getKey();
+		}
+		return null;
+	}
 }

@@ -259,35 +259,9 @@ public class PlayerHandler implements Listener
             statement = connection.prepareStatement("SELECT * FROM " + this.plugin.getTablePrefix() + "players WHERE uuid = ?;");
             statement.setString(1, p.getUniqueId().toString());
             resultSet = statement.executeQuery();
+            System.out.println("UUID=>"+p.getUniqueId().toString());
             if (resultSet.next()) {
-                Bukkit.getScheduler().runTaskAsynchronously((Plugin)CTSuite.getInstance(), (Runnable)new Runnable() {
-                    @Override
-                    public void run() {
-                        PreparedStatement statement = null;
-                        Connection connection = null;
-                        try {
-                            connection = PlayerHandler.this.plugin.getMySQLConnection();
-                            statement = connection.prepareStatement("UPDATE " + PlayerHandler.this.plugin.getTablePrefix() + "players SET server = ?, world = ?, online = 1 WHERE uuid = ?;");
-                            statement.setString(1, Bukkit.getServerName());
-                            statement.setString(2, p.getWorld().getName());
-                            statement.setString(3, p.getUniqueId().toString());
-                            statement.execute();
-                        }
-                        catch (SQLException e) {
-                            e.printStackTrace();
-                        }
-
-                        if (statement != null) {
-                            try { statement.close(); }
-                            catch (SQLException ex) { ex.printStackTrace(); }
-                        }
-                        if (connection != null) {
-                            try { connection.close(); }
-                            catch (SQLException ex) { ex.printStackTrace(); }
-                        }
-                    }
-                });
-                
+            	// Set login location
                 String strLoginLocation = resultSet.getString("login_location");
                 if (strLoginLocation != null) {
                 	CTLocation loginLocation = CTLocation.fromString(strLoginLocation);
@@ -317,9 +291,38 @@ public class PlayerHandler implements Listener
                         p.setGameMode(gm);
                 }
                 catch (Exception ex) { }
+                
+                Bukkit.getScheduler().runTaskAsynchronously((Plugin)CTSuite.getInstance(), (Runnable)new Runnable() {
+                    @Override
+                    public void run() {
+                        PreparedStatement statement = null;
+                        Connection connection = null;
+                        try {
+                            connection = PlayerHandler.this.plugin.getMySQLConnection();
+                            statement = connection.prepareStatement("UPDATE " + PlayerHandler.this.plugin.getTablePrefix() + "players SET server = ?, world = ?, online = 1 WHERE uuid = ?;");
+                            statement.setString(1, Bukkit.getServerName());
+                            statement.setString(2, p.getWorld().getName());
+                            statement.setString(3, p.getUniqueId().toString());
+                            statement.execute();
+                        }
+                        catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+
+                        if (statement != null) {
+                            try { statement.close(); }
+                            catch (SQLException ex) { ex.printStackTrace(); }
+                        }
+                        if (connection != null) {
+                            try { connection.close(); }
+                            catch (SQLException ex) { ex.printStackTrace(); }
+                        }
+                    }
+                });
             }
-            else
+            else {
                 p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&4[CTSuiteBukkit]: &cError: player not found in database"));
+            }
         }
         catch (SQLException e) {
             e.printStackTrace();

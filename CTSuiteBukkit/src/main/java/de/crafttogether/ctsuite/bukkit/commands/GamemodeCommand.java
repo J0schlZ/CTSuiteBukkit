@@ -130,30 +130,25 @@ public class GamemodeCommand implements TabExecutor
             
             List<String> newList = new ArrayList<String>();
             List<String> proposals = new ArrayList<String>();
-            
-            Boolean hasPermGm = false;
             Boolean hasPermGmOthers = false;
             
             if (sender instanceof Player)
                 p = (Player)sender;
             
-            if (p == null || this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode"))
-                hasPermGm = true;
-            
-            if (p == null || this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others"))
+            if (this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others"))
                 hasPermGmOthers = true;
             
-            if (args.length == 1 && hasPermGm) {
-                if (this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.survival") || this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others.spectator"))
+            if (args.length == 1 && this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode")) {
+                if (this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.survival") || (hasPermGmOthers && this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others.spectator")))
                 	proposals.add("survival");
                 
-                if (this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.creative") || this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others.spectator"))
+                if (this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.creative") || (hasPermGmOthers && this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others.spectator")))
                     proposals.add("creative");
                 
-                if (this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.adventure") || this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others.spectator"))
+                if (this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.adventure") || (hasPermGmOthers && this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others.spectator")))
                     proposals.add("adventure");
                 
-                if (this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.spectator") || this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others.spectator"))
+                if (this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.spectator") || (hasPermGmOthers && this.plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.gamemode.others.spectator")))
                     proposals.add("spectator");
                 
             }

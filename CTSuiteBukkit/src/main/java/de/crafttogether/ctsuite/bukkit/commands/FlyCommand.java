@@ -160,10 +160,10 @@ public class FlyCommand implements TabExecutor
             if (sender instanceof Player)
                 p = (Player)sender;
             
-            if (p == null || plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.fly"))
+            if (plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.fly"))
                 hasPermFly = true;
             
-            if (p == null || plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.fly.others"))
+            if (plugin.getPlayerHandler().hasPermission(sender, "ctsuite.command.fly.others"))
                 hasPermFlyOthers = true;
             
             if (args.length == 1 && hasPermFly) {
