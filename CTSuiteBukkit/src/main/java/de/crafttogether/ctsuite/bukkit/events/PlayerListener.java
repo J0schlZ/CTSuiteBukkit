@@ -77,7 +77,7 @@ public class PlayerListener implements Listener
     public void onPlayerQuit(PlayerQuitEvent ev) {
 		NetworkMessage nMessage = new NetworkMessage("player.update.leaved.server");
         nMessage.put("uuid", ev.getPlayer().getUniqueId());
-        nMessage.put("location", new CTLocation(ev.getPlayer().getLocation(), Bukkit.getServerName()).toString());
+        nMessage.put("location", new CTLocation(ev.getPlayer().getLocation(), Bukkit.getServer().getName()).toString());
         nMessage.send("proxy");
     }
 
@@ -85,7 +85,7 @@ public class PlayerListener implements Listener
     public void onPlayerKick(PlayerKickEvent ev) {
 		NetworkMessage nMessage = new NetworkMessage("player.update.kicked.server");
         nMessage.put("uuid", ev.getPlayer().getUniqueId());
-        nMessage.put("location", new CTLocation(ev.getPlayer().getLocation(), Bukkit.getServerName()).toString());
+        nMessage.put("location", new CTLocation(ev.getPlayer().getLocation(), Bukkit.getServer().getName()).toString());
         nMessage.put("reason", ev.getReason());
         nMessage.put("message", ev.getLeaveMessage());
         nMessage.send("proxy");

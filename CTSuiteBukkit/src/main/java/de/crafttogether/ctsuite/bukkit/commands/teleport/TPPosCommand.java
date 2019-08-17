@@ -111,7 +111,7 @@ public class TPPosCommand implements TabExecutor {
     	else
     		loc = new Location(world, y, y, z);
         
-        if (world != null && target != null && target.isOnline() && Bukkit.getServerName().equalsIgnoreCase(serverName))       	
+        if (world != null && target != null && target.isOnline() && Bukkit.getServer().getName().equalsIgnoreCase(serverName))       	
     		target.teleport(loc);
         else {
         	CTLocation ctLoc = new CTLocation(loc, worldName, serverName);
@@ -157,7 +157,7 @@ public class TPPosCommand implements TabExecutor {
 						break;
 					}
 					if (proposals.size() < 1) {
-						proposals.add(Bukkit.getServerName());
+						proposals.add(Bukkit.getServer().getName());
 						for (String server : plugin.getWorldHandler().server) {
 							if (server.equalsIgnoreCase("proxy") || !plugin.getPlayerHandler().hasPermission(p, "ctsuite.server." + server)) continue;
 							proposals.add(server);

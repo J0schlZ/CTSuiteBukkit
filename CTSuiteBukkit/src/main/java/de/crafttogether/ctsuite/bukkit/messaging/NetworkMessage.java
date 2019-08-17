@@ -3,7 +3,6 @@ package de.crafttogether.ctsuite.bukkit.messaging;
 import java.util.HashMap;
 
 import de.crafttogether.ctsuite.bukkit.CTSuite;
-import de.crafttogether.ctsuite.bukkit.messaging.adapter.Sockets4MC;
 
 public class NetworkMessage
 {
@@ -26,8 +25,8 @@ public class NetworkMessage
         this.receiver = server;
         final String adapter = this.adapter;
         switch (adapter) {
-            case "Sockets4MC": {
-                Sockets4MC.getInstance().send(this.messageKey, this.receiver, this.values);
+            case "SocketConnector": {
+                //SocketConnector.getInstance().send(this.messageKey, this.receiver, this.values);
                 break;
             }
         }

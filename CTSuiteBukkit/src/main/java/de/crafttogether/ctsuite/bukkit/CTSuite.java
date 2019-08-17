@@ -22,7 +22,6 @@ import de.crafttogether.ctsuite.bukkit.events.PlayerListener;
 import de.crafttogether.ctsuite.bukkit.events.WorldListener;
 import de.crafttogether.ctsuite.bukkit.handlers.PlayerHandler;
 import de.crafttogether.ctsuite.bukkit.handlers.WorldHandler;
-import de.crafttogether.ctsuite.bukkit.messaging.adapter.Sockets4MC;
 import net.milkbowl.vault.chat.Chat;
 
 public class CTSuite extends JavaPlugin
@@ -60,8 +59,8 @@ public class CTSuite extends JavaPlugin
         
         final String messagingService = this.messagingService;
         switch (messagingService) {
-            case "Sockets4MC": {
-                new Sockets4MC();
+            case "SocketConnector": {
+                //new SocketConnector();
                 break;
             }
         }

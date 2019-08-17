@@ -122,7 +122,7 @@ public class PlayerHandler implements Listener
 		if (p == null)
 			return;
 		
-		CTLocation loc = new CTLocation(p.getLocation(), Bukkit.getServerName());
+		CTLocation loc = new CTLocation(p.getLocation(), Bukkit.getServer().getName());
 		NetworkMessage nm = new NetworkMessage("player.response.location");
 		
 		nm.put("location", loc.toString());
@@ -250,7 +250,7 @@ public class PlayerHandler implements Listener
 		this.pendingTeleports.put(playerUUID, pendingTeleport);
 	}
     
-    public void registerLogin(Player p) {
+    public void registerLogin(final Player p) {
         ResultSet resultSet = null;
         PreparedStatement statement = null;
         Connection connection = null;
@@ -300,7 +300,7 @@ public class PlayerHandler implements Listener
                         try {
                             connection = PlayerHandler.this.plugin.getMySQLConnection();
                             statement = connection.prepareStatement("UPDATE " + PlayerHandler.this.plugin.getTablePrefix() + "players SET server = ?, world = ?, online = 1 WHERE uuid = ?;");
-                            statement.setString(1, Bukkit.getServerName());
+                            statement.setString(1, Bukkit.getServer().getName());
                             statement.setString(2, p.getWorld().getName());
                             statement.setString(3, p.getUniqueId().toString());
                             statement.execute();

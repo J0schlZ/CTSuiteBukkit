@@ -21,7 +21,7 @@ public class WorldListener implements Listener
     public void onWorldLoad(final WorldLoadEvent ev) {
         String worldName = ev.getWorld().getName();
         if (this.plugin.getWorldHandler().worlds.containsKey(worldName)) {
-            this.plugin.getWorldHandler().worlds.put(worldName, Bukkit.getServerName());
+            this.plugin.getWorldHandler().worlds.put(worldName, Bukkit.getServer().getName());
         }
         NetworkMessage nm = new NetworkMessage("data.update.world.loaded");
         nm.put("world", worldName);

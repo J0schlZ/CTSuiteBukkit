@@ -119,7 +119,7 @@ public class CTLocation {
 	public static Location getLocation(CTLocation ctLoc) {
 		World world = null;
 		
-		if (!Bukkit.getServerName().equalsIgnoreCase(ctLoc.getServer()))
+		if (!Bukkit.getServer().getName().equalsIgnoreCase(ctLoc.getServer()))
 			return null;
 		
 		world = Bukkit.getServer().getWorld(ctLoc.getWorld());
